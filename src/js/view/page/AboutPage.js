@@ -13,6 +13,14 @@ export default class AboutPage extends ModalPage {
     super('About TolstoyPro', true, 'about');
     this.html = `
 <div id="about_page" class="static_page">
+  <h2>Version 0.2</h2>
+  <ul>
+    <li>New user flows: nominally functional.</li>
+    <li>UX: ugly, but functional.</li>
+    <li>Project create, rename: functional.</li>
+    <li>File create: functional.</li>
+    <li>Application state restores across happy case scenarios.</li>
+  </ul>
   <h2>F.A.Q.</h2>
   <dl>
   <dt>Is TolstoyPro really ready for prime time?</dt>

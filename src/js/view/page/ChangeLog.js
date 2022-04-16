@@ -24,8 +24,18 @@ export default class ChangeLog extends ModalPage {
   <div class="changelog">
     <ol class="majver" style="counter-reset: majver 1" reversed>
       <li><b>Pre-Release Development</b>
-        <ol class="minver" style="counter-reset: minver 2" reversed>
-          <li><b><u>Basic Editor</u></b>
+        <ol class="minver" style="counter-reset: minver 3" reversed>
+          <li><b><b>The Basic Editor</b>
+            <ol class="relver" style="counter-reset: relver 2" reversed>
+              <li> (04.16.22)
+                <ul class="clist">
+                  <li>All Basic Editing functionality is solid assuming good network connectivity.</li>
+                  <li>Development now goes to branched strategy.</li>
+                </ul>
+              </li>
+            </ol>
+          </li>
+          <li><b><u>Building to Usable</u></b>
             <ol class="relver" style="counter-reset: relver 10" reversed>
               <li> (04.16.22)
                 <ul class="clist">

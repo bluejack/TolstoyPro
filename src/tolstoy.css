@@ -151,8 +151,17 @@ b {
   text-align: center;    
 }
 
-#modal_content {
+#modal_page_content {
   padding: 12px;
+}
+
+#modal_page_content ul {
+  list-style: '☆' outside;
+  padding-left: 32px;
+}
+
+#modal_page_content ul li {
+  padding-left: 10px;
 }
 
 #modal_page {
@@ -505,19 +514,19 @@ ol.relver li:before {
   content: counter(majver) "." counter(minver) "." counter(relver) "  ";
 }
 
-ul.clist {
+#changelog ul.clist {
   margin: 0px;
   border: none;
   list-style-type: square;
   padding: 0px 0px 0px 30px;
 }
 
-ul.clist li {
+#changelog ul.clist li {
   padding: 0px;
   counter-increment: none;
 }
 
-ul.clist li:before {
+#changelog ul.clist li:before {
   content: "";
 }
 

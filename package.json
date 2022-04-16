@@ -1,7 +1,7 @@
 {
   "name": "TolstoyPro",
-  "version": "0.0.1",
-  "description": "The professional writing app for the cloud future.",
+  "version": "0.2.1",
+  "description": "A serious writing app for serious writers.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
