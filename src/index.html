@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<head>
+  <title><%= htmlWebpackPlugin.options.title %></title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="<%= htmlWebpackPlugin.options.metaDesc %>">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro|IBM+Plex+Mono|Josefin+Sans">
+  <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
+ 
+<!-- include the styles for the loading screen so it does jibber jabber -->
+  <style>
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+#loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Josefin Sans", serif;
+  font-size: 0.9em;
+  text-align: center;
+  z-index: 10;
+}
+
+.rotate {
+  animation: rotation 6s infinite linear;
+}
+  </style>
+</head>
+
+<body id="app" class="default_theme">
+  <div id="loading">
+    <img src="/img/tolstoy_lg_light.png" width=300 height=300 alt="Logo whilst loading..." class="rotate" /><br />
+    <p>( loading )</p>
+  </div>
+  <div id="menu"></div>
+  <div id="thebiz">
+    <div id="tree"></div>
+    <div id="editor"></div>
+    <div id="applets"></div>
+  </div>
+  <div id="footer"></div>
+</body>
+</html>
