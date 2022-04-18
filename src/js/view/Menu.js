@@ -57,10 +57,14 @@ function init() {
   help_menu.add_menu_item(new MenuSeparator(help_dom, 'sep2'));
   help_menu.add_menu_item(new AlwaysOnMenuItem(help_dom, 'change_mi', 'Change log', 
     () => { ModalFactory.trigger('changelog'); }));
+/* ((( These will be made available when/if we decide to offer subscriptions. There's no point in offering these without a company to reference; it only adds risk to accidentally offer something that implies a legal contract. )))
   help_menu.add_menu_item(new AlwaysOnMenuItem(help_dom, 'privacy_mi', 'Privacy Policy', 
     () => { ModalFactory.trigger('privacy'); }));
   help_menu.add_menu_item(new AlwaysOnMenuItem(help_dom, 'tos_mi', 'Terms of Service', 
     () => { ModalFactory.trigger('tos'); }));
+*/
+  help_menu.add_menu_item(new AlwaysOnMenuItem(help_dom, 'roadmap_mi', 'Roadmap', 
+    () => { ModalFactory.trigger('roadmap'); }));
 }
 
 /* ( Private Methods )>----------------------------------------------------- */

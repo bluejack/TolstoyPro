@@ -19,9 +19,11 @@ import PreferencesDialog from './PreferencesDialog.js';
 import PrivacyPolicy     from '../page/PrivacyPolicy.js';
 import ProjectChooser    from './ProjectChooser.js';
 import ProjectDialog     from './ProjectDialog.js';
+import Roadmap           from '../page/Roadmap.js';
 import ToSPage           from '../page/ToSPage.js';
 import SupportDialog     from './SupportDialog.js';
 import WelcomePage       from '../page/WelcomePage.js';
+
 
 export default {
   enqueue: enqueue,
@@ -42,6 +44,7 @@ var map = {
   privacy:        () => { return new PrivacyPolicy();     },
   project_edit:   () => { return new EditProjectDialog(); },
   project_create: () => { return new ProjectDialog();     },
+  roadmap:        () => { return new Roadmap();           },
   tos:            () => { return new ToSPage();           },
   support:        () => { return new SupportDialog();     },
   welcome:        () => { return new WelcomePage();       },

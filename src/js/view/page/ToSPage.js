@@ -12,7 +12,7 @@ export default class TermsOfService extends ModalPage {
     this.html = `
 <div id="tos" class="static_page">
   <h1>TolstoyPro: Terms of Service</h1>
-  <p>Coming soon.</p>
+  <p>This website is offered "as is" with no </p>
 </div>
     `;
   }

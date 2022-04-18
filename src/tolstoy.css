@@ -164,6 +164,14 @@ b {
   padding-left: 10px;
 }
 
+#roadmap ul {
+  list-style: disc outside;
+}
+
+#roadmap ul li ul {
+  border: none;
+}
+
 #modal_page {
   margin: 40px auto;
   padding-bottom: 16px;
