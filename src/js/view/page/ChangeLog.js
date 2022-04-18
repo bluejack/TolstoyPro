@@ -29,10 +29,17 @@ export default class ChangeLog extends ModalPage {
             <ol class="relver" style="counter-reset: relver 2" reversed>
               <li> (04.16.22)
                 <ul class="clist">
+                  <li> Roadmap complete</li>
+                  <li> Bug fix: fix state on proj change</li>
+                </ul>
+              </li>
+              <li> (04.16.22)
+                <ul class="clist">
                   <li>All Basic Editing functionality is solid assuming good network connectivity.</li>
                   <li>Development now goes to branched strategy.</li>
                 </ul>
               </li>
+              
             </ol>
           </li>
           <li><b><u>Building to Usable</u></b>

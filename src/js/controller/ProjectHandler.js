@@ -74,6 +74,7 @@ function clear() {
 async function set_curr(new_curr) {
   curr = new_curr;
   await curr.load();
+  await AppState.proj_id(curr);
   notify();
 }
 

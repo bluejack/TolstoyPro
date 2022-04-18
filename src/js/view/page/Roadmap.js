@@ -85,7 +85,7 @@ export default class Roadmap extends ModalPage {
     <li> Native apps for iOS devices</li>
     <li> Cross-project search</li>
     <li> (Many) more project and file templates</li>
-    <li> 
+  </ul>
 </div>
     `;
   }
