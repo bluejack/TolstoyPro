@@ -8,5 +8,6 @@ This project is intended as my own writing app, and while you could download and
 
 ### Current Version
 
-For all current version and roadmap information, see https://www.tolstoy.pro
+For all current version and roadmap information, see https://www.tolstoy.pro/#roadmap
+
 
