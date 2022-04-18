@@ -48,7 +48,7 @@ async function init() {
   try {
     var id = await AppState.proj_id();
     if (id) {
-      var name = await Cloud.get_obj_meta(id);
+      var name = await Cloud.get_obj_name(id);
       if (name) {
         curr = new Project(name, id);
         await curr.load();

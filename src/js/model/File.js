@@ -18,11 +18,12 @@
 import Cloud    from '../persist/Cloud.js';
 import Log      from '../sys/Log.js';
 import TreeNode from './TreeNode.js';
+import _        from 'lodash';
 
 export default class File extends TreeNode {
 
-  constructor(id, name, description) {
-    super(id, name, description);
+  constructor(id, name, description, ts) {
+    super(id, name, description, ts);
     this.content = null;
   }
 
@@ -37,7 +38,8 @@ export default class File extends TreeNode {
   }
 
   set_content(c) {
-    if (c !== this.content) {
+    // Do a changed-on-disk check here.
+    if (!_.isEqual(c.ops, this.content.ops)) {
       this.content = c;
       this.save();
     }
@@ -45,7 +47,7 @@ export default class File extends TreeNode {
   
   async get_content() {
     try {
-      if (!this.content) {
+      if (!this.content || Cloud.has_file_changed(this.id, this.ts)) {
         try {
           this.#parse(await Cloud.load_file(this.id));
         } catch (err) {
@@ -59,7 +61,8 @@ export default class File extends TreeNode {
   }
 
   async save() {
-    return Cloud.save_file(this.id, this.#encode());
+    var ts = await Cloud.save_file(this.id, this.#encode());
+    this.ts = ts;
   }
 
   #parse(v) {

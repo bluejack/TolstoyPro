@@ -25,10 +25,11 @@ export default {
   create_folder: create_folder,
   pull_folder:   pull_folder,
   list_folder:   list_folder,
-  get_obj_meta:  get_obj_meta,
+  get_obj_name:  get_obj_name,
   new_proj_meta: new_proj_meta,
   get_proj_meta: get_proj_meta,
   rename_obj:    rename_obj,
+  has_file_changed: has_file_changed,
   create_file:   create_file,
   save_file:     save_file,
   load_file:     load_file, 
@@ -182,12 +183,23 @@ async function create_folder(parent, name) {
   return rsp.result.id;
 }
 
-async function get_obj_meta(id) {
+async function get_obj_name(id) {
   var rsp = await gpi.client.drive.files.get({ fileId: id });
   if (rsp && rsp.result) {
     return rsp.result.name;
   }
   return null;
+}
+
+async function has_file_changed(id, ts) {
+  if (!ts) {
+    return false;
+  }
+  var rsp = await gpi.client.drive.files.get({ fileId: id, fields: 'name,modifiedTime' });
+  if (ts == Date.parse(rsp.result.modifiedTime)) {
+    return false;
+  } 
+  return true;
 }
 
 async function rename_obj(id, name) {
@@ -206,7 +218,7 @@ async function pull_folder(parid) {
 async function list_folder(parid) {
   var rsp = await gpi.client.drive.files.list({
     q: `mimeType='application/json' and '${parid}' in parents and name != '${PROJ_META_NAME}'`,
-    fields: "files(id, name, mimeType)"
+    fields: "files(id, name, mimeType, modifiedTime)"
   });
   return rsp.result.files;
 }
@@ -220,9 +232,13 @@ async function create_file(parid, name, mime) {
   };
   var rsp = await gpi.client.drive.files.create({
       resource: file,
-      fields: 'id'
+      fields: 'id,modifiedTime'
     });
-  return rsp.result.id;
+  const dt = Date.parse(rsp.result.modifiedTime);
+  return {
+    id: rsp.result.id,
+    ts: dt
+  };
 }
 
 async function save_file(id, content) {
@@ -232,11 +248,12 @@ async function save_file(id, content) {
     params: { uploadType: 'media' },
     body: content
   });
-  return rsp;
+  rsp = await gpi.client.drive.files.get({fileId: id, fields: 'modifiedTime'});
+  return Date.parse(rsp.result.modifiedTime);
 }
 
 async function load_file(id) {
-  var rsp = await gpi.client.drive.files.get({'fileId': id, 'alt': 'media'});
+  var rsp = await gpi.client.drive.files.get({'fileId': id, alt: 'media'});
   return rsp.body;
 }
 

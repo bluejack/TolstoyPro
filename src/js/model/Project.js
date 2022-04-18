@@ -65,10 +65,10 @@ export default class Project {
 
   async create_file(name, desc) {
     try {
-      var fid = await Cloud.create_file(this.id, name);
-      var file = new File(fid, name, desc);
+      var res = await Cloud.create_file(this.id, name);
+      var file = new File(res.id, name, desc, res.ts);
       await file.save();
-      this.map[fid] = file;
+      this.map[res.id] = file;
       this.tree.push(file);
       this.curr = file;
       this.#notify();
@@ -123,7 +123,7 @@ export default class Project {
         obj.tree.forEach((n) => {
           // FixMe: n.type should be enforced.
           if (n && (n.type == 'file' || !n.type)) {
-            var f = new File(n.id, n.name, n.desc);
+            var f = new File(n.id, n.name, n.desc, n.ts);
             this.tree.push(f);
             this.map[n.id] = f; 
           } else {

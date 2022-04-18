@@ -1,9 +1,10 @@
 
 export default class TreeNode {
-  constructor(id, name, desc) {
+  constructor(id, name, desc, ts) {
     this.id   = id;
     this.name = name;
     this.desc = desc;
+    this.ts   = ts;
     this.nodes = [];
     this.obs   = [];
   }
@@ -22,6 +23,10 @@ export default class TreeNode {
   
   get_nodes() {
     return this.nodes;
+  }
+  
+  get_ts() {
+    return this.ts;
   }
   
   observe(cb) {
