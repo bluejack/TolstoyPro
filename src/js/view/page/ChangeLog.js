@@ -25,7 +25,7 @@ export default class ChangeLog extends ModalPage {
     <ol class="majver" style="counter-reset: majver 1" reversed>
       <li><b>Pre-Release Development</b>
         <ol class="minver" style="counter-reset: minver 3" reversed>
-          <li><b><b>The Basic Editor</b>
+          <li><b><u>The Basic Editor</u>
             <ol class="relver" style="counter-reset: relver 2" reversed>
               <li> (04.16.22)
                 <ul class="clist">
@@ -42,7 +42,7 @@ export default class ChangeLog extends ModalPage {
               
             </ol>
           </li>
-          <li><b><u>Building to Usable</u></b>
+          <li><u>Building to Usable</u>
             <ol class="relver" style="counter-reset: relver 10" reversed>
               <li> (04.16.22)
                 <ul class="clist">
@@ -95,7 +95,7 @@ export default class ChangeLog extends ModalPage {
               </li>
             </ol>
           </li>
-          <li><b><u>Foundational Development</u></b>
+          <li><u>Foundational Development</u>
             <ol class="relver" style="counter-reset: relver 16" reversed>
               <li> (02.26.22)
                 <ul class="clist">

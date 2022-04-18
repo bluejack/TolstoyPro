@@ -25,6 +25,8 @@
   --hyperlink: #000077;
   --system-font: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --content-font: "Josefin Sans", Tahoma, Arial, sans-serif;
+  --monofont: "IBM Plex Mono", monospace;
+  --page-text-weight: normal;
 }
 
 .cream_theme {
@@ -54,6 +56,8 @@
   --hyperlink: #000077;
   --system-font: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --content-font: "Josefin Sans", Tahoma, Arial, sans-serif;
+  --monofont: "IBM Plex Mono", monospace;
+  --page-text-weight: normal;
 }
 
 .dark_theme {
@@ -82,7 +86,9 @@
   --button-shadow: #223355;
   --hyperlink: #AAAAFF;
   --system-font: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --content-font: "Josefin Sans", Tahoma, Arial, sans-serif;
+  --content-font: "Josefin Sans", sans-serif;
+  --monofont: "IBM Plex Mono", monospace;
+  --page-text-weight: 200;
 }
 
 html {
@@ -90,7 +96,7 @@ html {
 }
 
 body {
-  font-family: "Tahoma", sans-serif;
+  font-family: var(--content-font);
   position: relative;
   height: 100%;
 }
@@ -128,12 +134,14 @@ b {
   background-color: var(--modal-bg);
   color: var(--strong-color);
   box-shadow: 3px 3px 8px var(--login-weight);
+  font-weight: var(--page-text-weight);
 }
 
 #dialog_h {
   border-radius: 4px 4px 0px 0px;
   padding: 4px 8px;
   background-color: var(--modal-h-bg);
+  font-weight: var(--page-text-weight);
 }
 
 #close_modal {
@@ -146,30 +154,37 @@ b {
 
 #modal_page_h {
   font-size: 1.2em;
-  font-weight: bold;
+  font-weight: normal;
   padding: 8px 0px 12px;
   text-align: center;    
 }
 
 #modal_page_content {
   padding: 12px;
+  line-height: 1.1;
+  font-size: 1.1em;
+  font-weight: var(--page-text-weight);
 }
 
 #modal_page_content ul {
   list-style: '☆' outside;
   padding-left: 32px;
+  font-weight: var(--page-text-weight);
 }
 
 #modal_page_content ul li {
   padding-left: 10px;
+  font-weight: var(--page-text-weight);
 }
 
 #roadmap ul {
   list-style: disc outside;
+  font-weight: var(--page-text-weight);
 }
 
 #roadmap ul li ul {
   border: none;
+  font-weight: var(--page-text-weight);
 }
 
 #modal_page {
@@ -472,53 +487,53 @@ static_page li {
 }
 
 .changelog {
-  font-family: "Tahoma", "Arial", sans-serif;
+  font-size: 0.9em;
+  font-family: var(--monofont);
+  font-weight: var(--page-text-weight);
 }
 
-ol.majver {
+.changelog ol.majver {
   list-style: none;
   margin-left: 30px;
+  font-weight: var(--page-text-weight);
 }
 
-ol.majver li {
+.changelog ol.majver li {
   padding: 16px 0px;
   counter-increment: majver -1;
-  font-size: 1.1em;
-  font-weight: bold;
+  font-weight: var(--page-text-weight);
 }
 
-ol.majver li:before {
+.changelog ol.majver li:before {
   content: counter(majver) ".x.x ";
 }
 
-ol.minver {
+.changelog ol.minver {
   list-style: none;
+  font-weight: var(--page-text-weight);
 }
 
-ol.minver li {
+.changelog ol.minver li {
   padding: 8px 0px;
   counter-increment: minver -1;
-  font-size: 1.0em;
-  font-weight: normal;
 }
 
-ol.minver li:before {
+.changelog ol.minver li:before {
   content: counter(majver) "." counter(minver) ".x ";
 }
 
-ol.relver {
+.changelog ol.relver {
   padding-top: 8px;
   list-style: none;
   
 }
 
-ol.relver li {
-  padding: 0px;
+.changelog ol.relver li {
+  padding: 8px 0px;
   counter-increment: relver -1;
-  font-size: 0.9em;
 }
 
-ol.relver li:before {
+.changelog ol.relver li:before {
   content: counter(majver) "." counter(minver) "." counter(relver) "  ";
 }
 
@@ -527,15 +542,19 @@ ol.relver li:before {
   border: none;
   list-style-type: square;
   padding: 0px 0px 0px 30px;
+  font-weight: var(--page-text-weight);
+  font-family: var(--monofont);
 }
 
 #changelog ul.clist li {
   padding: 0px;
   counter-increment: none;
+  font-weight: var(--page-text-weight);
 }
 
 #changelog ul.clist li:before {
   content: "";
+  font-weight: var(--page-text-weight);
 }
 
 ol.intro {
