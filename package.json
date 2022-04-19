@@ -1,6 +1,6 @@
 {
   "name": "TolstoyPro",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A serious writing app for serious writers.",
   "main": "index.js",
   "scripts": {

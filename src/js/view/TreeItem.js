@@ -7,6 +7,7 @@
 \* ========================================================================= */
 
 import Component from './Component.js';
+import FileDialog from './modal/FileDialog.js';
 
 export default class TreeItem extends Component {
   constructor(pelm, item, proj) {
@@ -23,6 +24,11 @@ export default class TreeItem extends Component {
     this.elm.onclick = () => {
       self.proj.set_curr(self.item);
     };
+    this.elm.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+      var edit_file = new FileDialog(self.item);
+      edit_file.render();
+    });
   }
   
 }

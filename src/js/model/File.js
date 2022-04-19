@@ -27,39 +27,46 @@ export default class File extends TreeNode {
     this.content = null;
   }
 
-  set_name(n) {
-    this.name = n;
-    // Todo change file name on disc. 
+  get_name() {
+    return this.name;
   }
 
-  set_description(d) {
-    this.desc = d;
-    this.save();
+  get_description() {
+    return this.description;
+  }
+
+  async update(name, desc) {
+    if (name !== this.name) {
+      this.name = name;
+      Cloud.rename_obj(this.id, this.name);
+    }
+    if (desc !== this.desc) {
+      this.desc = desc;
+      this.save();
+    }
   }
 
   set_content(c) {
     // Do a changed-on-disk check here.
-    if (!_.isEqual(c.ops, this.content.ops)) {
+    if (!this.content || !this.content.ops || !_.isEqual(c.ops, this.content.ops)) {
       this.content = c;
       this.save();
     }
   }
   
   async get_content() {
-    try {
-      if (!this.content || Cloud.has_file_changed(this.id, this.ts)) {
-        try {
-          this.#parse(await Cloud.load_file(this.id));
-        } catch (err) {
-          Log.warn(err);
-        }
+    // Changed on disk check?
+    if (!this.content) {
+      try {
+        this.#parse(await Cloud.load_file(this.id));
+      } catch (err) {
+        Log.error(err);
       }
-    } catch (err) {
-      Log.error(err);
     }
     return this.content;
   }
 
+  // ToDo -- there might be a race condition with loading content.
   async save() {
     var ts = await Cloud.save_file(this.id, this.#encode());
     this.ts = ts;

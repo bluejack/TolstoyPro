@@ -55,6 +55,7 @@ export default class Project {
   set_curr(f) {
     this.curr = f;
     this.#notify();
+    this.save();
   }
 
   walk_tree(cb) {
@@ -108,11 +109,19 @@ export default class Project {
           await this.curr.get_content();
         }
       }
-      // Get top level 
-//      var pfiles = await Cloud.pull_folder(this.id);
+      // Now, background load the files.
+      this.#cache_files();
+      // Todo double check file names from cloud.
+      return;
     } catch (err) {
       console.log(err);
     }
+  }
+
+  async #cache_files() {
+    this.walk_tree(async (i) => {
+      await i.get_content();
+    });
   }
 
   // May need to rework this when we implement folders

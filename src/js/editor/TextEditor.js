@@ -87,12 +87,12 @@ async function set_file(f) {
     file = f;
     var ct = await f.get_content();
     if (!ct) {
-      ct = {};
+      ct = { ops: [ { insert: '\n' }]};
     }
     quedit.setContents(ct,'api');
   } catch (err) {
     Log.error(err);
-  }
+  } 
 }
   
 

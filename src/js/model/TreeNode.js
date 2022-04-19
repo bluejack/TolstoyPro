@@ -51,7 +51,6 @@ export default class TreeNode {
       type: this.type,
       id: this.id,
       name: this.name,
-      desc: this.desc,
       tree: tree
     };
   }

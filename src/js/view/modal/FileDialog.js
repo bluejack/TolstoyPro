@@ -7,8 +7,8 @@
 \* ========================================================================= */
 
 import Dialog   from './Dialog.js';
-import File     from '../../model/File.js';
 import PHandler from '../../controller/ProjectHandler.js';
+import TreeView from '../TreeView.js';
 
 const display = `
 <div id="file" class="modal_body">
@@ -49,7 +49,7 @@ export default class FileDialog extends Dialog {
       throw('empty-name');
     } else {
       if (self.file) {
-        if (self.file.name() == self.name) {
+        if (self.file.get_name() == self.name && self.file.get_description() == self.desc) {
           throw('no-change');
         }
       }
@@ -77,8 +77,9 @@ export default class FileDialog extends Dialog {
       if (!self.file) {
         self.file = await proj.create_file(self.name, self.desc);
       } else {
-        self.file.name(self.name);
-        self.file.desc(self.desc);
+        await self.file.update(self.name, self.desc);
+        TreeView.render(proj);
+        proj.save();
       }
       super.remove();
     } catch(err) {
@@ -96,7 +97,6 @@ export default class FileDialog extends Dialog {
     var self = this;
     var but = document.getElementById('file_submit');
     if (this.file) {
-      console.log(this.file);
       var input = document.getElementById('file_name');
       input.value = this.file.get_name();
       var desc = document.getElementById('file_desc');

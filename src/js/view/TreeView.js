@@ -13,7 +13,8 @@ import TreeTop  from './TreeTop.js';
 /* ( Interface )>----------------------------------------------------------- */
 
 export default {
-  init: init
+  init: init,
+  render: render
 };
 
 const html = `<div id="tree_view"></div>`;
@@ -29,17 +30,17 @@ function init(pelm) {
   telm.insertAdjacentHTML('beforeend', hier);
   helm = document.getElementById('hier');
   if (proj) {
-    _render(proj);
-    proj.observe(_render);
+    render(proj);
+    proj.observe(render);
   }
   ProjectHandler.observe((p) => {
-    p.observe(_render);
-    _render(p);
+    p.observe(render);
+    render(p);
     // Do we need to watch the project for changes?
   });
 }
 
-function _render(p) {
+function render(p) {
   helm.innerHTML = '';
   p.walk_tree((i) => {
     var titem = new TreeItem(helm, i, p);
