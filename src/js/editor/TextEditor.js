@@ -8,7 +8,8 @@
 
 import Quill from 'quill';
 import Log   from '../sys/Log.js';
-import ProjectHandler from '../controller/ProjectHandler.js';
+import PersistObserver from './PersistObserver.js';
+import ProjectHandler  from '../controller/ProjectHandler.js';
 
 export default {
   init:     init,
@@ -48,6 +49,7 @@ function init() {
     modules: { toolbar: toolbarOptions },
     theme: 'snow'
   });
+  PersistObserver.set_editor(quedit);
 
   var proj = ProjectHandler.get_curr();
   if (proj) {
@@ -81,6 +83,7 @@ function proj_observer(proj) {
 async function set_file(f) {
   try {
     if (file) {
+      PersistObserver.pause();
       file.set_content(quedit.getContents());
       file.save();
     }
@@ -90,6 +93,8 @@ async function set_file(f) {
       ct = { ops: [ { insert: '\n' }]};
     }
     quedit.setContents(ct,'api');
+    PersistObserver.start(f);
+    
   } catch (err) {
     Log.error(err);
   } 

@@ -29,6 +29,7 @@ export default class ChangeLog extends ModalPage {
             <ol class="relver" style="counter-reset: relver 3" reversed>
               <li> (04.19.22)
                 <ul class="clist">
+                  <li> Pro-active (but sane) file save strategy.</li>
                   <li> File Rename</li>
                 </ul>
               </li>
