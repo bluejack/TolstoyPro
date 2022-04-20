@@ -31,6 +31,7 @@ export default class ChangeLog extends ModalPage {
                 <ul class="clist">
                   <li> Pro-active (but sane) file save strategy.</li>
                   <li> File Rename</li>
+                  <li> Tree Styling</li>
                 </ul>
               </li>
               <li> (04.16.22)
