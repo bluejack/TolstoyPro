@@ -27,6 +27,8 @@
   --content-font: "Josefin Sans", Tahoma, Arial, sans-serif;
   --monofont: "IBM Plex Mono", monospace;
   --page-text-weight: normal;
+  --doc-icon: url('/img/document_lt.svg');
+  --icon-filter: invert(0);
 }
 
 .cream_theme {
@@ -58,6 +60,8 @@
   --content-font: "Josefin Sans", Tahoma, Arial, sans-serif;
   --monofont: "IBM Plex Mono", monospace;
   --page-text-weight: normal;
+  --doc-icon: url('/img/document_lt.svg');
+  --icon-filter: invert(0);
 }
 
 .dark_theme {
@@ -89,6 +93,8 @@
   --content-font: "Josefin Sans", sans-serif;
   --monofont: "IBM Plex Mono", monospace;
   --page-text-weight: 200;
+  --doc-icon: url('/img/document-dk.svg');
+  --icon-filter: invert(0.6);
 }
 
 html {
@@ -399,9 +405,30 @@ b {
 }
 
 .tree_item {
+  height: 18px;
   padding-top: 2px;
   font-size: 0.8em;
   cursor: pointer;
+}
+
+.tree_icon {
+  vertical-align: top;
+  filter: var(--icon-filter);
+  display: inline-block;
+  height: 12px;
+  width: 12px;
+}
+
+.tree_label {
+  display: inline-block;
+  padding-top: 1px;
+  padding-left: 4px;
+}
+
+.tree_doc {
+  background-image: var(--doc-icon);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 /* -- Editor -- */

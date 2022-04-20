@@ -13,7 +13,7 @@ export default class TreeItem extends Component {
   constructor(pelm, item, proj) {
     var domid = 'i.' + item.get_id();
     super(pelm, domid);
-    this.html = `<div id="${domid}" class="tree_item">${item.get_name()}</div>`;
+    this.html = `<div id="${domid}" class="tree_item"><span class="tree_icon tree_doc">&nbsp;</span><span class="tree_label">${item.get_name()}<span></div>`;
     this.item = item;
     this.proj = proj;
   }

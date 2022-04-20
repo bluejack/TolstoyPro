@@ -1,3 +1,4 @@
 *.env
 dist
+img
 node_modules
