@@ -9,34 +9,42 @@
 
 \* ========================================================================= */
 
-import Log from '../sys/Log.js';
-
 /* ( Interface )>----------------------------------------------------------- */
 
 export default {
-  connect:       conn,
+
+  // Auth
+  connect:       connect,
   login:         login,
   logout:        logout,
   reset:         reset,
+
+  // App Fundamentals
   get_root:      get_root,
   load_state:    load_state,
   set_state:     save_state,
   create_root:   create_root,
-  create_folder: create_folder,
-  pull_folder:   pull_folder,
-  list_folder:   list_folder,
-  get_obj_name:  get_obj_name,
-  new_proj_meta: new_proj_meta,
-  get_proj_meta: get_proj_meta,
-  rename_obj:    rename_obj,
-  has_file_changed: has_file_changed,
-  create_file:   create_file,
-  save_file:     save_file,
-  load_file:     load_file, 
-  delete_file:   del_file
+  
+  // Folders
+  folder_create: folder_create,
+  folder_list:   folder_list,
+
+  // Project
+  proj_create:   proj_create, // Creates folder & metadata file
+  proj_load:     proj_load, // Note: just loads metadata file
+  proj_list:     proj_list, // Lists all *projects*
+  proj_save:     proj_save,
+  
+  // Objects
+  obj_create:    obj_create,
+  obj_get_meta:  obj_get_meta,
+  obj_load:      obj_load,
+  obj_rename:    obj_rename,
+  obj_save:      obj_save,
+  obj_delete:    obj_delete,
+  obj_test_ts:   obj_test_ts
 };
 
-/* ( Members )>------------------------------------------------------------- */
 
 const GPI_LOADER = `${process.env.GPI_LOADER}`;
 const GPI_CLIENT = `${process.env.GPI_CLIENT}`;
@@ -57,13 +65,9 @@ var auth_resolver = {res: null, rej: null};
 var state_fid = null;
 var root_fid = null;
  
-/* ( Public Methods )>------------------------------------------------------ */
- 
-function get_root() {
-  return root_fid;
-}
+/* ( Public Auth Methods )>------------------------------------------------- */
 
-function conn() {
+function connect() {
   return new Promise((resolve, reject) => {
     
     auth_resolver.res = resolve;
@@ -121,10 +125,16 @@ async function logout() {
 }
 
 async function reset() {
-  Log.debug('Deleting state file.');
+  console.log('Deleting state file.');
   await gpi.client.drive.files.delete({fileId: state_fid});
-  Log.debug('revoking credentials.');
+  console.log('revoking credentials.');
   gauth.disconnect();
+}
+
+/* ( Public State Methods )>------------------------------------------------ */
+
+function get_root() {
+  return root_fid;
 }
 
 async function load_state() {
@@ -133,13 +143,13 @@ async function load_state() {
     if (!state_fid) { 
       return null;
     } else {
-      var body = await load_file(state_fid);
+      var body = await obj_load(state_fid);
       var state = JSON.parse(body);
       root_fid = state.root;
       return state;
     }
   } catch (err) {
-    Log.warning('No state file found.');
+    console.log(err);
     return null;
   }
 }
@@ -170,11 +180,15 @@ async function create_root() {
   return rsp.result.id;
 }
 
-async function create_folder(parent, name) {
+/* ( Public Folder Methods )>----------------------------------------------- */
+
+async function folder_create(parent, name, props, desc) {
   var folder = {
-    name:     name,
-    mimeType: MIME_TYPE_FOLDER,
-    parents:  [parent]
+    name:        name,
+    mimeType:    MIME_TYPE_FOLDER,
+    properties:  props,
+    description: desc,
+    parents:     [parent]
   };
   var rsp = await gpi.client.drive.files.create({
     resource: folder,
@@ -183,39 +197,8 @@ async function create_folder(parent, name) {
   return rsp.result.id;
 }
 
-async function get_obj_name(id) {
-  var rsp = await gpi.client.drive.files.get({ fileId: id });
-  if (rsp && rsp.result) {
-    return rsp.result.name;
-  }
-  return null;
-}
-
-async function has_file_changed(id, ts) {
-  if (!ts) {
-    return false;
-  }
-  var rsp = await gpi.client.drive.files.get({ fileId: id, fields: 'name,modifiedTime' });
-  if (ts == Date.parse(rsp.result.modifiedTime)) {
-    return false;
-  } 
-  return true;
-}
-
-async function rename_obj(id, name) {
-  var params = { name: name };
-  return await gpi.client.drive.files.update( { fileId: id, resource: params });
-}
-
-async function pull_folder(parid) {
-  var rsp = await gpi.client.drive.files.list({
-    q: "mimeType='application/vnd.google-apps.folder' and '" + parid + "' in parents",
-    fields: "files(id, name, mimeType)"
-  });
-  return rsp.result.files;
-}
-
-async function list_folder(parid) {
+// Q: should this restrict to json? 
+async function folder_list(parid) {
   var rsp = await gpi.client.drive.files.list({
     q: `mimeType='application/json' and '${parid}' in parents and name != '${PROJ_META_NAME}'`,
     fields: "files(id, name, mimeType, modifiedTime)"
@@ -223,7 +206,45 @@ async function list_folder(parid) {
   return rsp.result.files;
 }
 
-async function create_file(parid, name, mime) {
+/* ( Public Project Methods )>---------------------------------------------- */
+
+async function proj_create(name) {
+  return await folder_create(root_fid, name, { curr: 'NA' }, `A project named ${name}` );
+}
+
+async function proj_load(id) {
+  var ret = {};
+  var rsp = await obj_get_meta(id);
+  console.log(rsp);
+  ret.proj = rsp;
+  var rsp = await gpi.client.drive.files.list({
+    q: `'${id}' in parents`,
+    fields: "files(id, name, description, properties, modifiedTime)"
+  });
+  ret.files = rsp.result.files;
+  return ret;
+}
+
+async function proj_list() {
+  var rsp = await gpi.client.drive.files.list({
+    q: `mimeType='${MIME_TYPE_FOLDER}' and '${root_fid}' in parents`,
+    fields: "files(id, name, modifiedTime)"
+  });
+  return rsp.result.files;
+}
+
+async function proj_save(id, name, curr) {
+  var rsp = await gpi.client.drive.files.update({
+    fileId: id,
+    name: name,
+    properties: { curr: curr }
+  });
+  return rsp;
+} 
+
+/* ( Public Object Methods )>----------------------------------------------- */
+
+async function obj_create(parid, name, mime) {
   if (!mime) mime = MIME_TYPE_JSON;
   var file = {
     name: name,
@@ -241,7 +262,41 @@ async function create_file(parid, name, mime) {
   };
 }
 
-async function save_file(id, content) {
+async function obj_get_meta(id) {
+  var rsp = await gpi.client.drive.files.get({ fileId: id, fields: 'name,properties,description,modifiedTime' });
+  if (rsp && rsp.result) {
+    return { 
+      name: rsp.result.name,
+      ts:   rsp.result.modifiedTime,
+      prop: rsp.result.properties,
+      desc: rsp.result.description
+    };
+  }
+  return null;
+}
+
+async function obj_test_ts(id, ts) {
+  if (!ts) {
+    return false;
+  }
+  var rsp = await gpi.client.drive.files.get({ fileId: id, fields: 'name,modifiedTime' });
+  if (ts == Date.parse(rsp.result.modifiedTime)) {
+    return false;
+  } 
+  return true;
+}
+
+async function obj_load(id) {
+  var rsp = await gpi.client.drive.files.get({'fileId': id, alt: 'media'});
+  return rsp.body;
+}
+
+async function obj_rename(id, name) {
+  var params = { name: name };
+  return await gpi.client.drive.files.update( { fileId: id, resource: params });
+}
+
+async function obj_save(id, content) {
   var rsp = await gpi.client.request({
     path:   '/upload/drive/v3/files/' + id,
     method: 'PATCH',
@@ -252,30 +307,7 @@ async function save_file(id, content) {
   return Date.parse(rsp.result.modifiedTime);
 }
 
-async function load_file(id) {
-  var rsp = await gpi.client.drive.files.get({'fileId': id, alt: 'media'});
-  return rsp.body;
-}
-
-async function get_proj_meta(parent) {
-  var rsp = await gpi.client.drive.files.list({
-    q: `mimeType='${MIME_TYPE_JSON}' and name='${PROJ_META_NAME}' and '${parent}' in parents`,
-    fields: 'files(id)'
-  });
-  if (rsp.result.files && rsp.result.files[0]) {
-    return { id: rsp.result.files[0].id, meta: await load_file(rsp.result.files[0].id) };
-  } else {
-    return null;
-  }
-}
-
-async function new_proj_meta(parent, content) {
-  var id = await create_file(parent, PROJ_META_NAME, MIME_TYPE_JSON);
-  await save_file(id, content);
-  return id;
-}
-
-async function del_file(id) {
+async function obj_delete(id) {
   return gpi.client.drive.files.delete({
    fileId: id
   });      

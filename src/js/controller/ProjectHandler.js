@@ -48,17 +48,10 @@ async function init() {
   try {
     var id = await AppState.proj_id();
     if (id) {
-      var name = await Cloud.get_obj_name(id);
-      if (name) {
-        curr = new Project(name, id);
-        await curr.load();
-        _validate();
-      } else {
-        // Expected project missing, repair?
-      }
+      curr = await Project.load(id);
+      _validate();
       notify();
     } else {
-      // First time user: generate special messaging?
       ModalFactory.enqueue('project_create');
     }
   } catch (err) {
@@ -91,8 +84,7 @@ async function rename(name) {
 }
 
 async function create(name) {
-  var id = await Cloud.create_folder(Cloud.get_root(), name);
-  var p = new Project(name, id);
+  var p = Project.create(name);
   curr = p;
   AppState.proj_id(p);
   ModalFactory.enqueue('file_create');
@@ -100,12 +92,10 @@ async function create(name) {
 }
 
 async function list() {
-  var contents = await Cloud.pull_folder(Cloud.get_root());
+  var contents = await Cloud.proj_list();
   var projects = [];
   contents.forEach((obj) => {
-    if (obj.mimeType == 'application/vnd.google-apps.folder') {
-      projects.push({id: obj.id, name: obj.name});
-    }
+    projects.push({id: obj.id, name: obj.name});
   });
   return projects;
 }

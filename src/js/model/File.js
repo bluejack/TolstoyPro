@@ -38,7 +38,7 @@ export default class File extends TreeNode {
   async update(name, desc) {
     if (name !== this.name) {
       this.name = name;
-      Cloud.rename_obj(this.id, this.name);
+      Cloud.obj_rename(this.id, this.name);
     }
     if (desc !== this.desc) {
       this.desc = desc;
@@ -58,7 +58,7 @@ export default class File extends TreeNode {
     // Changed on disk check?
     if (!this.content) {
       try {
-        this.#parse(await Cloud.load_file(this.id));
+        this.#parse(await Cloud.obj_load(this.id));
       } catch (err) {
         Log.error(err);
       }
@@ -68,7 +68,7 @@ export default class File extends TreeNode {
 
   // ToDo -- there might be a race condition with loading content.
   async save() {
-    var ts = await Cloud.save_file(this.id, this.#encode());
+    var ts = await Cloud.obj_save(this.id, this.#encode());
     this.ts = ts;
   }
 
