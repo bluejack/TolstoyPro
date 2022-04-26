@@ -55,7 +55,7 @@ async function init() {
       ModalFactory.enqueue('project_create');
     }
   } catch (err) {
-    Log.warning('could not find project: ' + err);
+    Log.error(err);
   }
 }
 

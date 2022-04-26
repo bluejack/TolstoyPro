@@ -16,19 +16,19 @@ export default (() => {
 
   /* ----------------------------------------------------------------------- */
   
-  function err(msg, obj) {
-    console.log("ERROR: " + msg);
+  function err(err, obj) {
+    console.log("ERROR: " + err.message);
     if (obj) console.log(obj);
-    console.trace(); // This trace sucks; throw a fatal up the stack?
+    console.log(err.stack);
   }
   
-  function wrn(msg, obj) {
-    console.log("WARN: " + msg);
+  function wrn(err, obj) {
+    console.log("WARN: " + err.message);
     if (obj) console.log(obj);
   }
   
-  function dbg(msg, obj) {
-    console.log("DEBUG: " + msg);
+  function dbg(err, obj) {
+    console.log("DEBUG: " + err.message);
     if (obj) console.log(obj);
   }
 

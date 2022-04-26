@@ -67,7 +67,7 @@ export default (() => {
     try {
       await Cloud.reset();
       user = null;
-      Log.debug('Account reset complete.');
+      Log.debug(new Error('Account reset complete.'));
     } catch (err) {
       Log.error(err);
     }
