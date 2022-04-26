@@ -21,20 +21,16 @@ import ModalFactory   from './view/modal/ModalFactory.js';
 import ProjectHandler from './controller/ProjectHandler.js';
 import View           from './view/View.js';
 
-function _listen_for_url_changes(e) {
-  var dest = window.location.hash.substr(1);
-  if (dest && dest !== '#') {
-    ModalFactory.enqueue(dest);
-  }
-}
+/* ( Interface )>----------------------------------------------------------- */
 
-function process_url() {
-  window.addEventListener('popstate', _listen_for_url_changes);
-  return window.location.hash.substr(1);
-}
+export default {
+  start: start
+};
+
+/* ( Public )>-------------------------------------------------------------- */
 
 async function start() {
-  var dest = process_url();
+  var dest = _process_url();
   try {
     await Auth.connect();
     await AppState.init();
@@ -45,8 +41,18 @@ async function start() {
   }
 }
 
-export default {
-  start: start
-};
+/* ( Private )>------------------------------------------------------------- */
+
+function _listen_for_url_changes(e) {
+  var dest = window.location.hash.substr(1);
+  if (dest && dest !== '#') {
+    ModalFactory.enqueue(dest);
+  }
+}
+
+function _process_url() {
+  window.addEventListener('popstate', _listen_for_url_changes);
+  return window.location.hash.substr(1);
+}
 
 
