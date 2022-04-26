@@ -27,11 +27,11 @@ import Log   from '../sys/Log.js';
 export default class Project {
   
   constructor(id, name, curr, cache) {
-    this.name = name;
-    this.id = id;       // id of folder
-    this.map = {};      // Map of objects
-    this.cache = cache; // Tree of objects
-    this.curr = curr;   // Current file.
+    this.name  = name;
+    this.id    = id;     // id of folder
+    this.map   = {};     // Map of objects
+    this.cache = cache;  // Tree of objects
+    this.curr  = curr;   // Current file.
     this.observers = []; 
     this.build_map();
   }
@@ -126,7 +126,6 @@ export default class Project {
     });
   }
 
-  // Move to File object. 
   async create_file(name, desc) {
     try {
       var res = await Cloud.obj_create(this.id, name);

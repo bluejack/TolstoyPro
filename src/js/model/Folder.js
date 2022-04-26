@@ -4,7 +4,8 @@
    
    File container.
    
-   Does not, typically, have content.
+   Note: stores all persistent data in the file resource on google; there's
+   no need to json it down to disk.
 
 \* ======================================================================== */
 

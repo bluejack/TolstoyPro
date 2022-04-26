@@ -18,8 +18,8 @@ var changes = false;
 
 const SAVE_CHECK = 10000; // every ten seconds.
 
-function set_editor(editor) {
-  editor = editor;
+function set_editor(ed) {
+  editor = ed;
   editor.on('text-change', () => {
     changes = true;
   });
@@ -30,6 +30,7 @@ function start(file) {
   changes = false;
   interval = setInterval(() => {
     if (changes) {
+      file.set_content(editor.getContents());
       file.save();
     }
   },SAVE_CHECK);
