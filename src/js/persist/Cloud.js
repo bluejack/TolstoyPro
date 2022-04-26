@@ -215,13 +215,12 @@ async function proj_create(name) {
 async function proj_load(id) {
   var ret = {};
   var rsp = await obj_get_meta(id);
-  console.log(rsp);
   ret.proj = rsp;
-  var rsp = await gpi.client.drive.files.list({
+  var lst = await gpi.client.drive.files.list({
     q: `'${id}' in parents`,
     fields: "files(id, name, description, properties, modifiedTime)"
   });
-  ret.files = rsp.result.files;
+  ret.files = lst.result.files;
   return ret;
 }
 

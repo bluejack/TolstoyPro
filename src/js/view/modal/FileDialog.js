@@ -8,7 +8,7 @@
 
 import Dialog   from './Dialog.js';
 import PHandler from '../../controller/ProjectHandler.js';
-import TreeView from '../TreeView.js';
+import Tree from '../Tree.js';
 
 const display = `
 <div id="file" class="modal_body">
@@ -78,7 +78,7 @@ export default class FileDialog extends Dialog {
         self.file = await proj.create_file(self.name, self.desc);
       } else {
         await self.file.update(self.name, self.desc);
-        TreeView.render(proj);
+        Tree.render(proj);
         proj.save();
       }
       super.remove();

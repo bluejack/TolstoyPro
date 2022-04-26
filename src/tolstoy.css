@@ -363,22 +363,6 @@ b {
   font-size: 0.9em;
 }
 
-#tree_strip {
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding-left: 2px;
-  width: 20px;
-  font-family: var(--system-font);
-  line-height: 25px;
-  font-size: 30px;
-}
-
-#tree_strip a {
-  text-decoration: none;
-  color: var(--subtle-color);
-}
-
 #tree_panel {
   font-family: "Tahoma", "Arial", sans-serif;
   font-size: 0.9em;
@@ -388,7 +372,7 @@ b {
   position: absolute;
   top: 0;
   width: 100%;
-  left: 28px;
+  left: 6px;
   padding: 6px;
   border-top: 1px solid var(--std-border);
 }
@@ -398,6 +382,7 @@ b {
   font-size: 1.05em;
   font-weight: bold;
   padding-bottom: 4px;
+  cursor: pointer;
 }
 
 #hier {

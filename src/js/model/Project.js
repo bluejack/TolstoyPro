@@ -85,9 +85,9 @@ export default class Project {
           if (f.id == loc.curr) {
             curr = f;
           }
-          cache.push(new File(i.id, i.name));
+          cache.push(f);
         });
-        return new Project(id, loc.name, curr, loc.cache);
+        return new Project(id, loc.name, curr, cache);
       }
     } catch (err) {
       Log.error(err, id);
@@ -154,7 +154,7 @@ export default class Project {
   
   async save() {
     var cache = this.#encode();
-//    window.localStorage.setItem(this.id, cache);
+    window.localStorage.setItem(this.id, cache);
     return Cloud.proj_save(this.id, this.name, this.curr.id);
   }
   
@@ -206,11 +206,12 @@ export default class Project {
   
   #encode() {
     var sv = {
-      curr_id: this.curr.get_id(),
-      tree: []
+      name: this.name,
+      curr: this.curr.id,
+      cache: []
     };
     this.cache.forEach((n) => {
-      sv.tree.push(n.to_tree());
+      sv.cache.push(n.to_tree());
     });
     return JSON.stringify(sv);
   }

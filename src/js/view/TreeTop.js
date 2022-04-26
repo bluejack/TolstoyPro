@@ -7,12 +7,14 @@
 \* ========================================================================= */
 
 import Component from './Component.js';
+import EditProjectDialog from './modal/EditProjectDialog.js';
 import ProjectHandler from '../controller/ProjectHandler.js';
 
 export default class TreeTop extends Component {
   constructor(pelm, proj) {
     super(pelm, 'tree_top');
     this.html = `<div id="tree_top"></div>`;
+    this.proj = proj;
     this.set_proj(proj);
     this.proj_observe();
   }
@@ -39,5 +41,10 @@ export default class TreeTop extends Component {
     super.render();
     this.elm = document.getElementById('tree_top');
     this.elm.innerHTML = this.label;
+    this.elm.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+      var edit_proj = new EditProjectDialog(self.proj);
+      edit_proj.render();
+    });
   }
 }

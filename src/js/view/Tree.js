@@ -1,24 +1,51 @@
 /* ========================================================================= *\
    
-   Tree Panel
+   Tree
    
-   The major left sidebar of the primary app: project, file tree, etc.
+   The parent component for the file hierarchy tree.
    
 \* ========================================================================= */
 
-import TreeStrip from './TreeStrip.js';
-import TreeView  from './TreeView.js';
+import ProjectHandler from '../controller/ProjectHandler.js';
+import TreeItem from './TreeItem.js';
+import TreeTop  from './TreeTop.js';
 
 /* ( Interface )>----------------------------------------------------------- */
 
 export default {
-  init: init
+  init: init,
+  render: render
 };
 
+const html = `<div id="tree_view"></div>`;
+const hier = `<div id="hier"></div>`;
+var helm;
+
 function init() {
-  var telm = document.getElementById('tree');
-  var strip = new TreeStrip(telm);
-  strip.render();
-  TreeView.init(telm);
+  var pelm = document.getElementById('tree');
+  pelm.insertAdjacentHTML('beforeend', html);
+  var telm = document.getElementById('tree_view');
+  var proj = ProjectHandler.get_curr();
+  var top = new TreeTop(telm, proj);
+  top.render();
+  telm.insertAdjacentHTML('beforeend', hier);
+  helm = document.getElementById('hier');
+  if (proj) {
+    render(proj);
+    proj.observe(render);
+  }
+  ProjectHandler.observe((p) => {
+    p.observe(render);
+    render(p);
+    // Do we need to watch the project for changes?
+  });
+}
+
+function render(p) {
+  helm.innerHTML = '';
+  p.walk_tree((i) => {
+    var titem = new TreeItem(helm, i, p);
+    titem.render();
+  });
 }
 
