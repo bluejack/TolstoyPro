@@ -23,7 +23,7 @@ import _        from 'lodash';
 export default class File extends TreeNode {
 
   constructor(id, name, description, ts) {
-    super(id, name, description, ts);
+    super(id, name, description, 'file', ts);
     this.content = null;
   }
 
@@ -36,13 +36,10 @@ export default class File extends TreeNode {
   }
 
   async update(name, desc) {
-    if (name !== this.name) {
+    if (name !== this.name || desc !== this.desc) {
       this.name = name;
-      Cloud.obj_rename(this.id, this.name);
-    }
-    if (desc !== this.desc) {
       this.desc = desc;
-      this.save();
+      this.ts = await Cloud.obj_update(this.id, this.name, this.desc);
     }
   }
 
@@ -58,7 +55,7 @@ export default class File extends TreeNode {
     // Changed on disk check?
     if (!this.content) {
       try {
-        this.#parse(await Cloud.obj_load(this.id));
+        this.content = JSON.parse(await Cloud.obj_load(this.id));
       } catch (err) {
         Log.error(err);
       }
@@ -68,21 +65,11 @@ export default class File extends TreeNode {
 
   // ToDo -- there might be a race condition with loading content.
   async save() {
-    var ts = await Cloud.obj_save(this.id, this.#encode());
-    this.ts = ts;
+    var c = '';
+    if (this.content) {
+      c = JSON.stringify(this.content);
+    }
+    this.ts = await Cloud.obj_save(this.id, c);
   }
 
-  #parse(v) {
-    var val = JSON.parse(v);
-    this.desc = val.desc;
-    this.content = val.cont;
-  }
-  
-  #encode() {
-    return JSON.stringify({
-      desc: this.desc,
-      cont: this.content
-    });
-  }
-  
 }

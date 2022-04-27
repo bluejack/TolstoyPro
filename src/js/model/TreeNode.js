@@ -1,12 +1,13 @@
 
 export default class TreeNode {
-  constructor(id, name, desc, ts) {
+  constructor(id, name, desc, type, ts) {
     this.id   = id;
     this.name = name;
     this.desc = desc;
     this.ts   = ts;
     this.nodes = [];
     this.obs   = [];
+    this.type  = type;
   }
   
   get_id() {

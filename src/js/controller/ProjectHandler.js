@@ -84,7 +84,7 @@ async function rename(name) {
 }
 
 async function create(name) {
-  var p = Project.create(name);
+  var p = await Project.create(name);
   curr = p;
   AppState.proj_id(p);
   ModalFactory.enqueue('file_create');
