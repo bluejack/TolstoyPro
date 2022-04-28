@@ -52,7 +52,6 @@ export default class ProjectDialog extends Dialog {
   }
   
   #display_errors(err) {
-    console.log(err);
     switch (err) {
       case 'empty-name':
         document.getElementById('alert_missing').style = 'display: block;';

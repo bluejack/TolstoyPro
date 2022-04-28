@@ -46,14 +46,14 @@ export default {
 };
 
 
-const GPI_LOADER = `${process.env.GPI_LOADER}`;
-const GPI_CLIENT = `${process.env.GPI_CLIENT}`;
-const GPI_SCOPE  = `${process.env.GPI_SCOPE}`;
+const GPI_LOADER = process.env.GPI_LOADER;
+const GPI_CLIENT = process.env.GPI_CLIENT;
+const GPI_SCOPE  = process.env.GPI_SCOPE;
 const GPI_PARAMS = {
-  'api_key':       `${process.env.GPI_KEY}`, 
-  'client_id':     `${process.env.GPI_CLI_ID}`,
+  'api_key':       process.env.GPI_KEY, 
+  'client_id':     process.env.GPI_CLI_ID,
   'scope':         GPI_SCOPE,
-  'discoveryDocs': [`${process.env.GPI_DISCOVERY}`]
+  'discoveryDocs': [ process.env.GPI_DISCOVERY ]
 };
 const MIME_TYPE_FOLDER = 'application/vnd.google-apps.folder';
 const MIME_TYPE_JSON   = 'application/json';
@@ -162,7 +162,7 @@ async function save_state(s) {
     path:   '/upload/drive/v3/files/' + state_fid,
     method: 'PATCH',
     params: { uploadType: 'media' },
-    body: JSON.stringify(s)
+    body:   JSON.stringify(s)
   });
   return rsp;
 }
@@ -266,7 +266,7 @@ async function obj_get_meta(id) {
   if (rsp && rsp.result) {
     return { 
       name: rsp.result.name,
-      ts:   rsp.result.modifiedTime,
+      ts:   Date.parse(rsp.result.modifiedTime),
       prop: rsp.result.properties,
       desc: rsp.result.description
     };

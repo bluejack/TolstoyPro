@@ -20,17 +20,16 @@
    
 \* ======================================================================== */
 
-import Cloud from '../persist/Cloud.js';
-import File  from './File.js';
-import Log   from '../sys/Log.js';
+import Cloud  from '../persist/Cloud.js';
+import File   from './File.js';
+import Folder from './Folder.js';
+import Log    from '../sys/Log.js';
 
 export default class Project {
   
-  constructor(id, name, curr, cache) {
-    this.name  = name;
-    this.id    = id;     // id of folder
+  constructor(id, name, curr, nodes) {
+    this.folder = new Folder(id, name, null, null, nodes);
     this.map   = {};     // Map of objects
-    this.cache = cache;  // Tree of objects
     this.curr  = curr;   // Current file.
     this.observers = []; 
     this.build_map();
@@ -38,7 +37,7 @@ export default class Project {
   
   static async create(name) {
     var id = await Cloud.proj_create(name);
-    return new Project(id, name, null, []);
+    return new Project(id, name, null);
   }
 
   static async load(id) {
@@ -54,8 +53,8 @@ export default class Project {
   }
   
   static async #load_from_cloud(id) {
-    var remote = await Cloud.proj_load(id);
-    var proj   = remote.proj;
+    var cloud = await Cloud.proj_load(id);
+    var proj  = cloud.proj;
     // Todo: handle folders. 
     var cache = [];
     var cid = null;
@@ -63,11 +62,12 @@ export default class Project {
       cid = proj.prop.curr;
     }
     var curr = null;
-    remote.files.forEach((i) => {
+    cloud.files.forEach((i) => {
       var f = new File(i.id, i.name, i.description, i.ts);
       if (cid && cid == i.id) {
         curr = f;
       }
+      // Todo: build folder hierarchy
       cache.push(f);
     });
     return new Project(id, proj.name, curr, cache);
@@ -85,6 +85,7 @@ export default class Project {
           if (f.id == loc.curr) {
             curr = f;
           }
+          // Todo, build folder hierarchy.
           cache.push(f);
         });
         return new Project(id, loc.name, curr, cache);
@@ -102,11 +103,11 @@ export default class Project {
   }
 
   get_id() {
-    return this.id;
+    return this.folder.id;
   }
 
   get_name() {
-    return this.name;
+    return this.folder.name;
   }
   
   get_curr() {
@@ -121,18 +122,20 @@ export default class Project {
 
   walk_tree(cb) {
     // Needs to handle folder recursion; set up root folder?
-    this.cache.forEach((item) => {
+    this.folder.nodes.forEach((item) => {
       cb(item);
     });
   }
 
+  async create_folder(name, desc) {
+    var folder = Folder.create(this.folder.id, name, desc);    
+  }
+
   async create_file(name, desc) {
     try {
-      var res = await Cloud.obj_create(this.id, name);
-      var file = new File(res.id, name, desc, res.ts);
-      await file.save();
-      this.map[res.id] = file;
-      this.cache.push(file);
+      var file = File.create(this.folder.id, name, desc);
+      this.map[file.id] = file;
+      this.folder.nodes.push(file);
       this.curr = file;
       this.#notify();
       this.save();
@@ -142,74 +145,46 @@ export default class Project {
   }
   
   async rename (name) {
-    if (name == this.name) {
+    if (name == this.folder.name) {
       return;
     } else {
-      await Cloud.obj_rename(this.id, name);
-      this.name = name;
+      await Cloud.obj_rename(this.folder.id, name);
+      this.folder.name = name;
     }
     this.#notify();
   }
   
   async save() {
     var cache = this.#encode();
-    window.localStorage.setItem(this.id, cache);
-    return Cloud.proj_save(this.id, this.name, this.curr.id);
+    window.localStorage.setItem(this.folder.id, cache);
+    return Cloud.proj_save(this.folder.id, this.folder.name, this.curr.id);
   }
   
   async hydrate() {
     try {
-      var rsp = await Cloud.proj_load(this.id);
-      this.name = rsp.proj.name;
+      var rsp = await Cloud.proj_load(this.folder.id);
+      this.folder.name = rsp.proj.name;
       var nc = [];
-      this.cache.forEach(async (o) => {
+      this.folder.nodes.forEach(async (o) => {
         // Todo add folder type handling.
         var f = new File(o.id, o.name, o.desc, o.ts);
         nc.push(f);
         this.map[o.id] = f; 
         await f.get_content();
       });
-      this.cache = nc;
+      this.folder.nodes = nc;
     } catch (err) {
       console.log(err);
     }
   }
 
-  // May need to rework this when we implement folders
-  #decode(val) {
-    try {
-      var obj = JSON.parse(val);
-      if (obj && obj.tree) {
-        obj.tree.forEach((n) => {
-          // FixMe: n.type should be enforced.
-          if (n && (n.type == 'file' || !n.type)) {
-            var f = new File(n.id, n.name, n.desc, n.ts);
-            this.cache.push(f);
-            this.map[n.id] = f; 
-          } else {
-            console.log("Ignoring file type " + n.type + " -- not implemented yet?");
-            console.log(n);
-          } 
-        });
-      }
-      if (obj && obj.curr_id) {
-        this.curr = this.map[obj.curr_id];
-      }
-      console.log("Decoded:");
-      console.log(this);
-    } catch(err) {
-      console.log(err);
-      Log.error("Failed loading project metadata.", val);
-    }
-  }
-  
   #encode() {
     var sv = {
-      name: this.name,
+      name: this.folder.name,
       curr: this.curr.id,
       cache: []
     };
-    this.cache.forEach((n) => {
+    this.nodes.forEach((n) => {
       sv.cache.push(n.to_tree());
     });
     return JSON.stringify(sv);

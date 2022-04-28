@@ -12,6 +12,17 @@
    
    desc: { file description }
    cont: { delta content for editor }
+   
+   Cloud & local_storage representation:
+     name: <name>
+     id:   <cloud key id>
+     description: <description>
+     ts:   <last modified timestamp>
+     properties: 
+       nodes: < array of ids, referencing items: files do not use this. >
+       type:  'file'
+       
+   Cloud representation has content, obtained by separate request.
 
 \* ======================================================================== */
 
@@ -25,6 +36,11 @@ export default class File extends TreeNode {
   constructor(id, name, description, ts) {
     super(id, name, description, 'file', ts);
     this.content = null;
+  }
+  
+  static async create(parid, name, desc) {
+    var res = await Cloud.obj_create(parid, name, desc);
+    return new File(res.id, name, desc, res.ts);
   }
 
   get_name() {

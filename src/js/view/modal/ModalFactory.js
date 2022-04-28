@@ -52,7 +52,7 @@ var map = {
 
 function _create(name) {
   if (!map[name]) {
-    Log.warning("No matching location for: " + name);
+    Log.warning(new Error("No matching location for: " + name));
     return;
   }
   return map[name]();

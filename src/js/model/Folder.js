@@ -16,70 +16,32 @@ import _        from 'lodash';
 
 export default class Folder extends TreeNode {
 
-  constructor(id, name, description, ts, items) {
-    super(id, name, description, ts);
-    this.items = items;
+  constructor(id, name, description, ts, nodes) {
+    super(id, name, description, 'folder', ts);
+    this.nodes = nodes ? nodes : [];
   }
 
-  static async load(id) {
-    try {
-      var [meta, json] = await Promise.all([
-        Cloud.obj_get_meta(id),
-        Cloud.obj_load(id)
-      ]);
-      var body = JSON.parse(json);
-    } catch (err) {
-      Log.error(err, json);
-    }
-    var f = new Folder(id, meta.name, body.description, meta.modifiedTime, body.items);
-    console.log(f);
-    return f;
-  }
-
-  get_name() {
-    return this.name;
-  }
-
-  get_description() {
-    return this.description;
-  }
-
-  async update(name, desc) {
-    if (name !== this.name) {
-      this.name = name;
-      Cloud.obj_rename(this.id, this.name);
-    }
-    if (desc !== this.desc) {
-      this.desc = desc;
-      this.save();
-    }
-  }
-
-  add_node(i, pos) {
-    if (typeof pos == 'undefined' || pos >= this.nodes.length) {
-      this.nodes.push(i);
-    } else {
-      this.nodes.splice(pos, 0, i);
-    }
+  remove(node) {
+    this.nodes = _.remove(this.nodes, (n) => {return n.id == node.id});
     this.save();
   }
 
+  add(node, pos) {
+    if (typeof pos == 'undefined' || pos >= this.nodes.length) {
+      this.nodes.push(node);
+    } else {
+      this.nodes.splice(pos, 0, node);
+    }
+    this.save();
+  }
+  
   async save() {
-    var ts = await Cloud.save_file(this.id, this.#encode());
-    this.ts = ts;
+    var nlist = [];
+    this.nodes.forEach((n) => {nlist.push(n.id)});
+    var props = {
+      nodes: JSON.stringify(nlist)
+    };
+    await Cloud.proj_save(this.id, this.name, this.desc, props);
   }
 
-  #parse(v) {
-    var val = JSON.parse(v);
-    this.desc = val.desc;
-    this.content = val.cont;
-  }
-  
-  #encode() {
-    return JSON.stringify({
-      desc: this.desc,
-      cont: this.content
-    });
-  }
-  
 }
