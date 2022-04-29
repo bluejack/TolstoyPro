@@ -43,12 +43,9 @@ export default class File extends TreeNode {
     return new File(res.id, name, desc, res.ts);
   }
 
-  get_name() {
-    return this.name;
-  }
-
-  get_description() {
-    return this.description;
+  static async load(id) {
+    var rsp = await Cloud.obj_get_meta(id);
+    return new File(id, rsp.name, rsp.desc, rsp.ts);
   }
 
   async update(name, desc) {

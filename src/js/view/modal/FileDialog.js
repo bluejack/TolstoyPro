@@ -49,7 +49,7 @@ export default class FileDialog extends Dialog {
       throw('empty-name');
     } else {
       if (self.file) {
-        if (self.file.get_name() == self.name && self.file.get_description() == self.desc) {
+        if (self.file.get_name() == self.name && self.file.get_desc() == self.desc) {
           throw('no-change');
         }
       }

@@ -46,7 +46,7 @@ export default class Project {
       p = await Project.#load_from_cloud(id);
     }
     if (!p.curr) {
-      p.curr = p.cache[0];
+      p.curr = p.folder.nodes[0].id;
     }
     p.hydrate(); // Background loads.
     return p;
@@ -167,7 +167,7 @@ export default class Project {
       var nc = [];
       this.folder.nodes.forEach(async (o) => {
         // Todo add folder type handling.
-        var f = new File(o.id, o.name, o.desc, o.ts);
+        var f = await File.load(o.id);
         nc.push(f);
         this.map[o.id] = f; 
         await f.get_content();
@@ -184,7 +184,7 @@ export default class Project {
       curr: this.curr.id,
       cache: []
     };
-    this.nodes.forEach((n) => {
+    this.folder.nodes.forEach((n) => {
       sv.cache.push(n.to_tree());
     });
     return JSON.stringify(sv);

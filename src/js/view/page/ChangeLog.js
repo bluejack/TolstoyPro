@@ -27,13 +27,18 @@ export default class ChangeLog extends ModalPage {
         <ol class="minver" style="counter-reset: minver 3" reversed>
           <li><b><u>The Basic Editor</u>
             <ol class="relver" style="counter-reset: relver 4" reversed>
-              <li> (04.19.26)
+              <li> (04.27.22)
+                <ul class="clist">
+                  <li> Tree folder implementation</li>
+                </ul>
+              </li>
+              <li> (04.26.22)
                 <ul class="clist">
                   <li> Code cosmetics.</li>
                   <li> Root folder support.</li>
                 </ul>
               </li>
-              <li> (04.19.24)
+              <li> (04.24.22)
                 <ul class="clist">
                   <li> Refactoring project stragegy in prep for folders</li>
                 </ul>

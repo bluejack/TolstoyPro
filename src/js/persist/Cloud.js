@@ -39,7 +39,7 @@ export default {
   obj_create:    obj_create,
   obj_get_meta:  obj_get_meta,
   obj_load:      obj_load,
-  obj_rename:    obj_rename,
+  obj_update:    obj_update,
   obj_save:      obj_save,
   obj_delete:    obj_delete,
   obj_test_ts:   obj_test_ts
@@ -290,8 +290,9 @@ async function obj_load(id) {
   return rsp.body;
 }
 
-async function obj_rename(id, name) {
-  var params = { name: name };
+async function obj_update(id, name, desc) {
+  var params = { name: name,
+                 description: desc };
   return await gpi.client.drive.files.update( { fileId: id, resource: params });
 }
 
