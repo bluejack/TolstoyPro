@@ -236,6 +236,7 @@ b {
   vertical-align: top;
 }
 
+.context_menu,
 .home_menu .submenu,
 .top_menu .submenu {
   display: none;
@@ -267,6 +268,7 @@ b {
   display: block;
 }
 
+.cm_item,
 .menu_item {
   display: block;
   width: 102px;
@@ -274,12 +276,14 @@ b {
   padding: 6px 0px 6px 24px;
 }
 
-
+.cm_item,
 .mi_active {
   cursor: pointer;
   color:  var(--menu-text);
   background-color: var(--menu-hover);
 }
+
+.cm_item:hover,
 .mi_active:hover {
   background-color: var(--sub-menu-hover);
 }

@@ -7,7 +7,7 @@
 \* ========================================================================= */
 
 import ProjectHandler from '../controller/ProjectHandler.js';
-import TreeItem from './TreeItem.js';
+import TreeDoc  from './TreeDoc.js';
 import TreeTop  from './TreeTop.js';
 
 /* ( Interface )>----------------------------------------------------------- */
@@ -44,7 +44,7 @@ function init() {
 function render(p) {
   helm.innerHTML = '';
   p.walk_tree((i) => {
-    var titem = new TreeItem(helm, i, p);
+    var titem = new TreeDoc(helm, i, p);
     titem.render();
   });
 }

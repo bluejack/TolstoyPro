@@ -73,6 +73,7 @@ export default class ProjectDialog extends Dialog {
       }
       self.remove();
     } catch(err) {
+      console.log(err);
       self.#display_errors(err);
     }
   }

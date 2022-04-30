@@ -287,6 +287,7 @@ async function obj_test_ts(id, ts) {
 
 async function obj_load(id) {
   var rsp = await gpi.client.drive.files.get({'fileId': id, alt: 'media'});
+  if (! rsp.body) rsp.body = '{}';
   return rsp.body;
 }
 

@@ -133,7 +133,7 @@ export default class Project {
 
   async create_file(name, desc) {
     try {
-      var file = File.create(this.folder.id, name, desc);
+      var file = await File.create(this.folder.id, name, desc);
       this.map[file.id] = file;
       this.folder.nodes.push(file);
       this.curr = file;
@@ -148,8 +148,8 @@ export default class Project {
     if (name == this.folder.name) {
       return;
     } else {
-      await Cloud.obj_rename(this.folder.id, name);
       this.folder.name = name;
+      await this.save();
     }
     this.#notify();
   }
