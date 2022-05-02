@@ -35,6 +35,9 @@ export default {
   proj_list:     proj_list, // Lists all *projects*
   proj_save:     proj_save,
   
+  // Documents
+  doc_create:    doc_create,
+  
   // Objects
   obj_create:    obj_create,
   obj_get_meta:  obj_get_meta,
@@ -240,13 +243,20 @@ async function proj_save(id, name, curr) {
   return rsp;
 } 
 
+/* ( Public Document Methods )>--------------------------------------------- */
+
+async function doc_create(parid, name, desc) {
+  return await obj_create(parid, name, MIME_TYPE_JSON, desc, { type: 'doc' });
+}
+
 /* ( Public Object Methods )>----------------------------------------------- */
 
-async function obj_create(parid, name, mime) {
+async function obj_create(parid, name, mime, desc, props) {
   if (!mime) mime = MIME_TYPE_JSON;
   var file = {
     name: name,
-    'mimeType': mime,
+    description: desc,
+    mimeType: mime,
     parents: [parid]
   };
   var rsp = await gpi.client.drive.files.create({

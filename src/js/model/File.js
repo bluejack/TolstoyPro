@@ -39,7 +39,7 @@ export default class File extends TreeNode {
   }
   
   static async create(parid, name, desc) {
-    var res = await Cloud.obj_create(parid, name, desc);
+    var res = await Cloud.doc_create(parid, name, desc);
     return new File(res.id, name, desc, res.ts);
   }
 

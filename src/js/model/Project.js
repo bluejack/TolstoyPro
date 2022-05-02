@@ -100,13 +100,16 @@ export default class Project {
       nodes: [],
       curr:  null
     };
-    
+
     var rsp = await Cloud.proj_load(id);
+    console.log(rsp);
     proj_parts.name = rsp.proj.name;
     var cid = null;
     if (rsp.proj.prop && rsp.proj.prop.curr) {
       cid = rsp.proj.prop.curr;
     }
+
+    // TODO: Enhance to handle folders.    
     rsp.files.forEach((f) => {
       var f = new File(f.id, f.name, f.description, f.ts);
       if (cid && cid == f.id) {
@@ -115,6 +118,8 @@ export default class Project {
       proj_parts.map[f.id] = f;
       proj_parts.nodes.push(f);
     });
+    
+    
     return proj_parts;    
   }
 
