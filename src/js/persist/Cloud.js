@@ -45,7 +45,6 @@ export default {
   obj_test_ts:   obj_test_ts
 };
 
-
 const GPI_LOADER = process.env.GPI_LOADER;
 const GPI_CLIENT = process.env.GPI_CLIENT;
 const GPI_SCOPE  = process.env.GPI_SCOPE;
@@ -213,11 +212,11 @@ async function proj_create(name) {
 }
 
 async function proj_load(id) {
-  var ret = {};
-  var rsp = await obj_get_meta(id);
-  ret.proj = rsp;
-  var lst = await gpi.client.drive.files.list({
-    q: `'${id}' in parents`,
+  var ret   = {};
+  var rsp   = await obj_get_meta(id);
+  ret.proj  = rsp;
+  var lst   = await gpi.client.drive.files.list({
+    q:      `'${id}' in parents`,
     fields: "files(id, name, description, properties, modifiedTime)"
   });
   ret.files = lst.result.files;

@@ -27,12 +27,13 @@ import Log    from '../sys/Log.js';
 
 export default class Project {
   
-  constructor(id, name, curr, nodes) {
-    this.folder = new Folder(id, name, null, null, nodes);
-    this.map   = {};     // Map of objects
-    this.curr  = curr;   // Current file.
+  constructor(id, name, curr, nodes, map) {
+    this.id        = id;
+    this.folder    = new Folder(id, name, null, null, nodes);
+    this.map       = map;
+    this.curr      = curr;   // Current file.
     this.observers = []; 
-    this.build_map();
+    this.pending   = false;
   }
   
   static async create(name) {
@@ -44,33 +45,13 @@ export default class Project {
     var p = Project.#load_from_local(id);
     if ( !p ) {
       p = await Project.#load_from_cloud(id);
+    } else {
+      p.reconcile();
     }
     if (!p.curr) {
       p.curr = p.folder.nodes[0].id;
     }
-    p.hydrate(); // Background loads.
     return p;
-  }
-  
-  static async #load_from_cloud(id) {
-    var cloud = await Cloud.proj_load(id);
-    var proj  = cloud.proj;
-    // Todo: handle folders. 
-    var cache = [];
-    var cid = null;
-    if (proj.prop && proj.prop.curr) {
-      cid = proj.prop.curr;
-    }
-    var curr = null;
-    cloud.files.forEach((i) => {
-      var f = new File(i.id, i.name, i.description, i.ts);
-      if (cid && cid == i.id) {
-        curr = f;
-      }
-      // Todo: build folder hierarchy
-      cache.push(f);
-    });
-    return new Project(id, proj.name, curr, cache);
   }
   
   static #load_from_local(id) {
@@ -79,6 +60,7 @@ export default class Project {
       if (loc) {
         loc = JSON.parse(loc);
         var cache = [];
+        var map = {};
         var curr;
         loc.cache.forEach((i) => {
           var f = new File(i.id, i.name);
@@ -87,8 +69,9 @@ export default class Project {
           }
           // Todo, build folder hierarchy.
           cache.push(f);
+          map[f.id] = f;
         });
-        return new Project(id, loc.name, curr, cache);
+        return new Project(id, loc.name, curr, cache, map);
       }
     } catch (err) {
       Log.error(err, id);
@@ -96,10 +79,43 @@ export default class Project {
     return null;
   }
 
-  build_map() {
-    this.walk_tree((i) => {
-      this.map[i.id] = i;
+  static async #load_from_cloud(id) {
+    var parts   = await this.assemble_project(id);
+    return new Project(id, parts.name, parts.curr, parts.nodes, parts.map);
+  }
+  
+  async reconcile() {
+    var parts   = await Project.assemble_project(this.id);
+    this.name   = parts.name;
+    this.map    = parts.map;
+    this.folder = new Folder(this.id, this.name, null, null, parts.nodes);
+    this.curr   = parts.curr;
+    this.#notify();
+  }
+
+  static async assemble_project(id) {
+    var proj_parts = {
+      name:  null,
+      map:   {},
+      nodes: [],
+      curr:  null
+    };
+    
+    var rsp = await Cloud.proj_load(id);
+    proj_parts.name = rsp.proj.name;
+    var cid = null;
+    if (rsp.proj.prop && rsp.proj.prop.curr) {
+      cid = rsp.proj.prop.curr;
+    }
+    rsp.files.forEach((f) => {
+      var f = new File(f.id, f.name, f.description, f.ts);
+      if (cid && cid == f.id) {
+        proj_parts.curr = f;
+      }
+      proj_parts.map[f.id] = f;
+      proj_parts.nodes.push(f);
     });
+    return proj_parts;    
   }
 
   get_id() {
@@ -123,12 +139,12 @@ export default class Project {
   walk_tree(cb) {
     // Needs to handle folder recursion; set up root folder?
     this.folder.nodes.forEach((item) => {
-      cb(item);
+      cb(item, this.folder);
     });
   }
 
   async create_folder(name, desc) {
-    var folder = Folder.create(this.folder.id, name, desc);    
+    await Folder.create(this.folder.id, name, desc);    
   }
 
   async create_file(name, desc) {
@@ -143,7 +159,7 @@ export default class Project {
       console.log(err);
     }
   }
-  
+
   async rename (name) {
     if (name == this.folder.name) {
       return;
@@ -154,30 +170,32 @@ export default class Project {
     this.#notify();
   }
   
+  async remove_doc(d) {
+    var reset_curr = false;
+    if (d === this.curr) {
+      reset_curr = true;
+    }
+    delete this.map[d.id];
+    this.walk_tree((doc,fldr) => {
+      if (d.id == doc.id) {
+        fldr.remove(doc);
+        return true;
+      } else if (reset_curr) {
+        this.curr = doc;
+        reset_curr = false;
+      }
+      
+    });
+    this.#notify();
+    this.save();
+  }
+  
   async save() {
     var cache = this.#encode();
     window.localStorage.setItem(this.folder.id, cache);
     return Cloud.proj_save(this.folder.id, this.folder.name, this.curr.id);
   }
   
-  async hydrate() {
-    try {
-      var rsp = await Cloud.proj_load(this.folder.id);
-      this.folder.name = rsp.proj.name;
-      var nc = [];
-      this.folder.nodes.forEach(async (o) => {
-        // Todo add folder type handling.
-        var f = await File.load(o.id);
-        nc.push(f);
-        this.map[o.id] = f; 
-        await f.get_content();
-      });
-      this.folder.nodes = nc;
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   #encode() {
     var sv = {
       name: this.folder.name,
@@ -192,9 +210,16 @@ export default class Project {
   
   observe(cb) {
     this.observers.push(cb);
+    if (this.pending == true) {
+      this.#notify();
+      this.pending == false;
+    }
   }
   
   #notify() {
+    if (this.observers.count == 0) {
+      this.pending = true;
+    }
     this.observers.forEach((obs) => {
       obs(this);
     });

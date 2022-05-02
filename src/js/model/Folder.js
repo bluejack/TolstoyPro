@@ -22,7 +22,7 @@ export default class Folder extends TreeNode {
   }
 
   remove(node) {
-    this.nodes = _.remove(this.nodes, (n) => {return n.id == node.id});
+    this.nodes = _.remove(this.nodes, (n) => {return n.id != node.id});
     this.save();
   }
 

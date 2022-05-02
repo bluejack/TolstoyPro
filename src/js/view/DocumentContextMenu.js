@@ -4,6 +4,7 @@
 
 \* ======================================================================== */
 
+import DeleteDoc  from './modal/DeleteDoc.js';
 import FileDialog from './modal/FileDialog.js';
 
 export default {
@@ -30,7 +31,8 @@ function display(event, item) {
   };
 
   del_doc.onclick = () => {
-    console.log("Delete?");
+    var del_doc = new DeleteDoc(item);
+    del_doc.render();
     _dismiss();
   };
 }

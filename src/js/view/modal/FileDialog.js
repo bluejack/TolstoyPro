@@ -44,12 +44,12 @@ export default class FileDialog extends Dialog {
     document.getElementById('name_label').style = 'color: var(--color);';
   }
   
-  #validate_input(self) {
-    if (!self.name) {
+  #validate_input() {
+    if (!this.name) {
       throw('empty-name');
     } else {
-      if (self.file) {
-        if (self.file.get_name() == self.name && self.file.get_desc() == self.desc) {
+      if (this.file) {
+        if (this.file.get_name() == this.name && this.file.get_desc() == this.desc) {
           throw('no-change');
         }
       }
@@ -68,22 +68,22 @@ export default class FileDialog extends Dialog {
     }
   }
   
-  async #handle_submit(self) {
-    self.name = document.getElementById('file_name').value;
-    self.desc = document.getElementById('file_desc').value;
+  async #handle_submit() {
+    this.name = document.getElementById('file_name').value;
+    this.desc = document.getElementById('file_desc').value;
     try {
-      self.#validate_input(self);
+      this.#validate_input();
       var proj = PHandler.get_curr();
-      if (!self.file) {
-        self.file = await proj.create_file(self.name, self.desc);
+      if (!this.file) {
+        this.file = await proj.create_file(this.name, this.desc);
       } else {
-        await self.file.update(self.name, self.desc);
+        await this.file.update(this.name, this.desc);
         Tree.render(proj);
         proj.save();
       }
       super.remove();
     } catch(err) {
-      self.#display_errors(err);
+      this.#display_errors(err);
     }
   }
   
@@ -104,7 +104,7 @@ export default class FileDialog extends Dialog {
     }
     but.innerHTML = ctoa;
     but.onclick = () => {
-      self.#handle_submit(self);
+      self.#handle_submit();
     };
   }
 }

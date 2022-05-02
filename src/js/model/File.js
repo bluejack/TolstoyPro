@@ -55,6 +55,10 @@ export default class File extends TreeNode {
       this.ts = await Cloud.obj_update(this.id, this.name, this.desc);
     }
   }
+  
+  async delete() {
+    await Cloud.obj_delete(this.id);
+  }
 
   set_content(c) {
     // Do a changed-on-disk check here.
