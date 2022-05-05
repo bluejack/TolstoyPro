@@ -13,14 +13,12 @@
 
 import DCM        from './DocumentContextMenu.js';
 import TreeItem   from './TreeItem.js';
-import FileDialog from './modal/FileDialog.js';
-
 
 export default class TreeDoc extends TreeItem {
   constructor(pelm, item, proj, folder) {
-    var domid = 'i.' + item.get_id();
+    var domid = 'i.' + item.id;
     super(pelm, domid, item, proj, folder);
-    this.html = `<div id="${domid}" class="tree_item"><span class="tree_icon tree_doc">&nbsp;</span><span class="tree_label">${item.get_name()}<span></div>`;
+    this.html = `<div id="${domid}" class="tree_item"><span class="tree_icon tree_doc">&nbsp;</span><span class="tree_label">${item.name}<span></div>`;
   }
 
   render() {

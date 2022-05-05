@@ -29,8 +29,8 @@ export default {
   init:     init,
   clear:    clear,
   create:   create,
-  set_curr: set_curr,
-  get_curr: get_curr,
+  set:      set,
+  get:      get,
   list:     list,
   rename:   rename,
   observe:  observe
@@ -38,7 +38,7 @@ export default {
 
 /* Members o --------------------------------------------------------------- */
 
-var curr = null;
+var curr_proj = null;
 var obs  = [];
 
 /* Methods o --------------------------------------------------------------- */
@@ -48,9 +48,8 @@ async function init() {
   try {
     var id = await AppState.proj_id();
     if (id) {
-      curr = await Project.load(id);
+      curr_proj = await Project.load(id);
       _validate();
-      notify();
     } else {
       ModalFactory.enqueue('project_create');
     }
@@ -60,32 +59,31 @@ async function init() {
 }
 
 function clear() {
-  curr = null;
+  curr_proj = null;
 }
 
-// TODO: load the new project.
-async function set_curr(new_curr) {
-  curr = new_curr;
-  await curr.load();
-  await AppState.proj_id(curr);
+async function set(new_curr) {
+  curr_proj = new_curr;
+  await curr_proj.load();
+  await AppState.proj_id(curr_proj);
   notify();
 }
 
-function get_curr() {
-  return curr;
+function get() {
+  return curr_proj;
 }
 
 async function rename(name) {
-  if (!curr) {
+  if (!curr_proj) {
     throw 'no-active-project';
   }
-  await curr.rename(name);
+  await curr_proj.rename(name);
   notify();
 }
 
 async function create(name) {
   var p = await Project.create(name);
-  curr = p;
+  curr_proj = p;
   AppState.proj_id(p);
   ModalFactory.enqueue('file_create');
   notify();
@@ -109,12 +107,12 @@ function observe(cb) {
 
 function notify() {
   obs.forEach((cb) => {
-    cb(curr);
+    cb(curr_proj);
   });
 }
 
 function _validate() {
-  if (!curr.get_curr()) {
+  if (!curr_proj.curr) {
     ModalFactory.enqueue('file_create');
   }
 }

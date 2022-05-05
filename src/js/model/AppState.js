@@ -40,8 +40,8 @@ const default_state = {
   prefs: { 
     theme: 'default' 
   },
-  root: null, // google object id
-  proj: null  // google object id
+  root: null, // google object id for root folder
+  proj: null  // google object id for active project folder
 };
 
 /* Methods                o ------------------------------------------------ */
@@ -67,7 +67,7 @@ async function init() {
 async function sync() {
   state.prefs = model.prefs.get_map();
   try {
-    await Cloud.set_state(state);
+    await Cloud.app_save(state);
   } catch (err) {
     Log.error(err, state);
   }
@@ -75,7 +75,7 @@ async function sync() {
 
 async function proj_id(proj) {
   if (proj) {
-    state.proj = proj.get_id();
+    state.proj = proj.id;
     sync();
   }
   return state.proj;
@@ -88,11 +88,12 @@ function clear_state() {
 /* Private methods */
 
 async function _load_state() {
-  var s = await Cloud.load_state();
-  if (!s) {
-    s = default_state;
-    s.root = await Cloud.create_root();
-    await Cloud.set_state(s);
+  state = await Cloud.app_load();
+  if (!state) {
+    state = default_state;
+    var root_fid = await Cloud.app_create();
+    state.root = root_fid;
+    await Cloud.app_save(state);
   }
-  return s;
+  return state;
 }

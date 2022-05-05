@@ -20,32 +20,21 @@ export default {
   reset:         reset,
 
   // App Fundamentals
-  get_root:      get_root,
-  load_state:    load_state,
-  set_state:     save_state,
-  create_root:   create_root,
-  
-  // Folders
-  folder_create: folder_create,
-  folder_list:   folder_list,
+  app_create:    app_create,
+  app_load:      app_load,
+  app_save:      app_save,
 
   // Project
-  proj_create:   proj_create, // Creates folder & metadata file
-  proj_load:     proj_load, // Note: just loads metadata file
-  proj_list:     proj_list, // Lists all *projects*
+  proj_create:   proj_create,
+  proj_load:     proj_load, 
   proj_save:     proj_save,
   
   // Documents
   doc_create:    doc_create,
-  
-  // Objects
-  obj_create:    obj_create,
-  obj_get_meta:  obj_get_meta,
-  obj_load:      obj_load,
-  obj_update:    obj_update,
-  obj_save:      obj_save,
-  obj_delete:    obj_delete,
-  obj_test_ts:   obj_test_ts
+  doc_load:      doc_load,
+  doc_save:      doc_save,
+  doc_rename:    doc_rename,
+  doc_delete:    _obj_delete,
 };
 
 const GPI_LOADER = process.env.GPI_LOADER;
@@ -60,6 +49,13 @@ const GPI_PARAMS = {
 const MIME_TYPE_FOLDER = 'application/vnd.google-apps.folder';
 const MIME_TYPE_JSON   = 'application/json';
 const PROJ_META_NAME   = 'proj.meta.json';
+
+const OBJ_TYPE_APP      = 'app';
+const OBJ_TYPE_PROJECT  = 'project';
+const OBJ_TYPE_DOCUMENT = 'doc';
+const OBJ_TYPE_META     = 'meta';
+
+const ROOT_FOLDER       = 'Tolstoy';
 
 var gpi = null;
 var gauth = null;
@@ -128,24 +124,30 @@ async function logout() {
 
 async function reset() {
   console.log('Deleting state file.');
-  await gpi.client.drive.files.delete({fileId: state_fid});
+  await _obj_delete(state_fid);
   console.log('revoking credentials.');
   gauth.disconnect();
 }
 
-/* ( Public State Methods )>------------------------------------------------ */
+/* ( Public App Methods )>-------------------------------------------------- */
 
-function get_root() {
+async function app_create() {
+  
+  root_fid  = _root_create();
+  state_fid = _app_state_create();
+
+  [root_fid, state_fid] = await Promise.all([root_fid, state_fid]);
+  
   return root_fid;
 }
 
-async function load_state() {
+async function app_load() {
   try {
-    state_fid = await _get_app_state();
+    state_fid = await _app_state_load();
     if (!state_fid) { 
       return null;
     } else {
-      var body = await obj_load(state_fid);
+      var body = await _obj_data(state_fid);
       var state = JSON.parse(body);
       root_fid = state.root;
       return state;
@@ -156,176 +158,171 @@ async function load_state() {
   }
 }
 
-async function save_state(s) {
+async function app_save(s) {
   if (!state_fid) {
-    await _create_state();
+    throw new Error('no-state-file');
   }
-  var rsp = await gpi.client.request({
-    path:   '/upload/drive/v3/files/' + state_fid,
-    method: 'PATCH',
-    params: { uploadType: 'media' },
-    body:   JSON.stringify(s)
-  });
-  return rsp;
-}
-
-async function create_root() {
-  var folder = {
-    name:     'TolstoyPro',
-    mimeType: MIME_TYPE_FOLDER
-  };
-  var rsp = await gpi.client.drive.files.create({
-    resource: folder,
-    fields: 'id'
-  });
-  root_fid = rsp.result.id;
-  return rsp.result.id;
-}
-
-/* ( Public Folder Methods )>----------------------------------------------- */
-
-async function folder_create(parent, name, props, desc) {
-  var folder = {
-    name:        name,
-    mimeType:    MIME_TYPE_FOLDER,
-    properties:  props,
-    description: desc,
-    parents:     [parent]
-  };
-  var rsp = await gpi.client.drive.files.create({
-    resource: folder,
-    fields: 'id'
-  });
-  return rsp.result.id;
-}
-
-// Q: should this restrict to json? 
-async function folder_list(parid) {
-  var rsp = await gpi.client.drive.files.list({
-    q: `mimeType='application/json' and '${parid}' in parents and name != '${PROJ_META_NAME}'`,
-    fields: "files(id, name, mimeType, modifiedTime)"
-  });
-  return rsp.result.files;
+  return await _obj_write_data(state_fid, JSON.stringify(s));  
 }
 
 /* ( Public Project Methods )>---------------------------------------------- */
 
 async function proj_create(name) {
-  return await folder_create(root_fid, name, { curr: 'NA' }, `A project named ${name}` );
+  const proj_id = await _obj_create(root_fid, name, OBJ_TYPE_PROJECT, MIME_TYPE_FOLDER);
+  const meta_id = await _obj_create(proj_id, PROJ_META_NAME, OBJ_TYPE_META, MIME_TYPE_JSON);
+  return { proj_id: proj_id, meta_id: meta_id }
 }
 
 async function proj_load(id) {
-  var ret   = {};
-  var rsp   = await obj_get_meta(id);
-  ret.proj  = rsp;
-  var lst   = await gpi.client.drive.files.list({
-    q:      `'${id}' in parents`,
-    fields: "files(id, name, description, properties, modifiedTime)"
-  });
-  ret.files = lst.result.files;
-  return ret;
+  const meta_id   = await _pmeta_find(id, PROJ_META_NAME, OBJ_TYPE_META);
+  const proj_meta = await _obj_data(meta_id);
+  if (proj_meta) {
+    return JSON.parse(proj_meta);
+  } else {
+    return null;
+  }
+}
+
+async function proj_rename(id, name) {
+  return await _obj_write_meta(id, name, {type: OBJ_TYPE_META});
+}
+
+async function proj_save(id, state) {
+  return await _obj_write_data(id, JSON.stringify(state));
 }
 
 async function proj_list() {
-  var rsp = await gpi.client.drive.files.list({
-    q: `mimeType='${MIME_TYPE_FOLDER}' and '${root_fid}' in parents`,
-    fields: "files(id, name, modifiedTime)"
-  });
-  return rsp.result.files;
+  return await _folder_list(root_fid);
 }
-
-async function proj_save(id, name, curr) {
-  var rsp = await gpi.client.drive.files.update({
-    fileId: id,
-    name: name,
-    properties: { curr: curr }
-  });
-  return rsp;
-} 
 
 /* ( Public Document Methods )>--------------------------------------------- */
 
-async function doc_create(parid, name, desc) {
-  return await obj_create(parid, name, MIME_TYPE_JSON, desc, { type: 'doc' });
+async function doc_create(parid, name) {
+  return await _obj_create(parid, name, MIME_TYPE_JSON, { type: 'doc' });
 }
 
-/* ( Public Object Methods )>----------------------------------------------- */
+async function doc_load(id) {
+  return await _obj_data(id);
+}
 
-async function obj_create(parid, name, mime, desc, props) {
-  if (!mime) mime = MIME_TYPE_JSON;
-  var file = {
-    name: name,
-    description: desc,
-    mimeType: mime,
-    parents: [parid]
+async function doc_save(id, content) {
+  return await _obj_write_data(id, content);
+}
+
+async function doc_rename(id, name) {
+  return await _obj_write_meta(id, name);
+}
+
+/* ( Private Object Methods )>----------------------------------------------- */
+
+
+
+/* ( Private Methods )>----------------------------------------------------- */
+
+async function _root_create() {
+  var obj_def = {
+    name: ROOT_FOLDER,
+    mimeType: MIME_TYPE_FOLDER,
+    appProperties: { type: OBJ_TYPE_APP }
   };
   var rsp = await gpi.client.drive.files.create({
-      resource: file,
-      fields: 'id,modifiedTime'
-    });
-  const dt = Date.parse(rsp.result.modifiedTime);
-  return {
-    id: rsp.result.id,
-    ts: dt
+    resource: obj_def,
+    fields: 'id'
+  });
+  return rsp.result.id;
+}
+
+async function _obj_create(parent, name, type, mime) {
+  var obj_def = {
+    name:          name,
+    mimeType:      mime,
+    appProperties: { type: type },
+    parents:       [parent]
   };
+  var rsp = await gpi.client.drive.files.create({
+    resource: obj_def,
+    fields: 'id'
+  });
+  return rsp.result.id;
 }
 
-async function obj_get_meta(id) {
-  var rsp = await gpi.client.drive.files.get({ fileId: id, fields: 'name,properties,description,modifiedTime' });
-  if (rsp && rsp.result) {
-    return { 
-      name: rsp.result.name,
-      ts:   Date.parse(rsp.result.modifiedTime),
-      prop: rsp.result.properties,
-      desc: rsp.result.description
-    };
-  }
-  return null;
-}
-
-async function obj_test_ts(id, ts) {
-  if (!ts) {
-    return false;
-  }
-  var rsp = await gpi.client.drive.files.get({ fileId: id, fields: 'name,modifiedTime' });
-  if (ts == Date.parse(rsp.result.modifiedTime)) {
-    return false;
-  } 
-  return true;
-}
-
-async function obj_load(id) {
-  var rsp = await gpi.client.drive.files.get({'fileId': id, alt: 'media'});
-  if (! rsp.body) rsp.body = '{}';
-  return rsp.body;
-}
-
-async function obj_update(id, name, desc) {
+async function _obj_write_meta(id, name, props) {
   var params = { name: name,
-                 description: desc };
+                 properties: props };
   return await gpi.client.drive.files.update( { fileId: id, resource: params });
 }
 
-async function obj_save(id, content) {
+async function _obj_write_data(id, content) {
   var rsp = await gpi.client.request({
     path:   '/upload/drive/v3/files/' + id,
     method: 'PATCH',
     params: { uploadType: 'media' },
-    body: content
+    body:   content
   });
   rsp = await gpi.client.drive.files.get({fileId: id, fields: 'modifiedTime'});
   return Date.parse(rsp.result.modifiedTime);
 }
 
-async function obj_delete(id) {
+async function _obj_meta(id) {
+  var rsp = await gpi.client.drive.files.get({ fileId: id, fields: 'name,appProperties,modifiedTime' });
+  if (rsp && rsp.result) {
+    return { 
+      name: rsp.result.name,
+      ts:   Date.parse(rsp.result.modifiedTime),
+      prop: rsp.result.properties
+    };
+  }
+  return null;
+}
+
+async function _obj_data(id) {
+  var rsp = await gpi.client.drive.files.get({'fileId': id, alt: 'media'});
+  if (! rsp.body) rsp.body = '{}';
+  return rsp.body;
+}
+
+async function _obj_delete(id) {
   return gpi.client.drive.files.delete({
    fileId: id
   });      
 }
 
-/* ( Private Methods )>----------------------------------------------------- */
+async function _folder_list(id) {
+  const param = {
+    q: `'${id}' in parents`,
+    fields: 'files/id,files/name'
+  };
+  const rsp = await gpi.client.drive.files.list( param );
+  if (!rsp.result) {
+    return null;
+  } else {
+    return rsp.result.files;
+  }
+}
 
-async function _create_state() {
+// would it make sense to put the project file in the project space, and to name it with the project id?
+// Problem would be if there are any orphaned files based on user delete of projects, would need 
+// clean up mechanism.
+async function _pmeta_find(id, type) {
+  var param = { 
+    q: `name = '${PROJ_META_NAME}' and '${id}' in parents and appProperties has { key='type' and value='meta' } `,
+    fields: 'files/id'
+  };
+  var rsp;
+  try {
+    rsp = await gpi.client.drive.files.list( param );
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+  if (!rsp.result || !rsp.result.files || rsp.result.files.length == 0) {
+    return null;
+  } else {
+    return rsp.result.files[0]['id'];
+  }
+}
+
+async function _app_state_create() {
   var data = await gpi.client.drive.files.create({
       resource: {
         name: 'state.json',
@@ -333,8 +330,7 @@ async function _create_state() {
       },
       fields: 'id'
   });
-  state_fid = data.result.id;
-  return state_fid;
+  return data.result.id;
 }
 
 function _test_status() {
@@ -356,7 +352,7 @@ function _parse_user(prof) {
   };
 }
 
-async function _get_app_state() {
+async function _app_state_load() {
   var param = { 'spaces': 'appDataFolder', 'fields': '*' };
   var rsp = await gpi.client.drive.files.list( param );
   if (!rsp.result || !rsp.result.files || rsp.result.files.length == 0) {

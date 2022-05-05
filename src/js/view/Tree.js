@@ -25,7 +25,7 @@ function init() {
   var pelm = document.getElementById('tree');
   pelm.insertAdjacentHTML('beforeend', html);
   var telm = document.getElementById('tree_view');
-  var proj = ProjectHandler.get_curr();
+  var proj = ProjectHandler.get();
   var top = new TreeTop(telm, proj);
   top.render();
   telm.insertAdjacentHTML('beforeend', hier);
@@ -42,10 +42,12 @@ function init() {
 }
 
 function render(p) {
-  helm.innerHTML = '';
-  p.walk_tree((i) => {
-    var titem = new TreeDoc(helm, i, p);
-    titem.render();
-  });
+  if (p) {
+    helm.innerHTML = '';
+    p.walk_tree((i) => {
+      var titem = new TreeDoc(helm, i, p);
+      titem.render();
+    });
+  }
 }
 

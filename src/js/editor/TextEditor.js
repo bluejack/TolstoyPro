@@ -51,9 +51,9 @@ function init() {
   });
   PersistObserver.set_editor(quedit);
 
-  var proj = ProjectHandler.get_curr();
+  var proj = ProjectHandler.get();
   if (proj) {
-    var cf = proj.get_curr();
+    var cf = proj.curr;
     if (cf) {
       set_file(cf);
     }
@@ -66,7 +66,7 @@ function init() {
 }
 
 function ph_observer(proj) {
-  var nf = proj.get_curr();
+  var nf = proj.curr;
   if (nf) {
     set_file(nf);
   }
@@ -74,7 +74,7 @@ function ph_observer(proj) {
 }
 
 function proj_observer(proj) {
-  var nf = proj.get_curr();
+  var nf = proj.curr;
   if (nf !== file) {
     set_file(nf);
   }

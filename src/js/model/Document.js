@@ -1,10 +1,10 @@
 /* ======================================================================== *\
    
-   File
+   Document
    
-   A persistable object to represent a file with content.
+   A persistable object to represent a document's meta-data and content.
    
-   The file can be created with just a name, at which point nothing is done
+   The doc can be created with just a name, at which point nothing is done
    until something is saved, at which point the file is created, and 
    loaded onto the MetaTree.
    
@@ -16,12 +16,9 @@
    Cloud & local_storage representation:
      name: <name>
      id:   <cloud key id>
-     description: <description>
-     ts:   <last modified timestamp>
-     properties: 
-       nodes: < array of ids, referencing items: files do not use this. >
-       type:  'file'
-       
+     desc: <description>
+     type: 'doc'
+
    Cloud representation has content, obtained by separate request.
 
 \* ======================================================================== */
@@ -31,33 +28,30 @@ import Log      from '../sys/Log.js';
 import TreeNode from './TreeNode.js';
 import _        from 'lodash';
 
-export default class File extends TreeNode {
+export default class Document extends TreeNode {
 
-  constructor(id, name, description, ts) {
-    super(id, name, description, 'file', ts);
+  constructor(id, name, description) {
+    super(name, description, 'doc');
+    this.id = id;
     this.content = null;
   }
   
   static async create(parid, name, desc) {
-    var res = await Cloud.doc_create(parid, name, desc);
-    return new File(res.id, name, desc, res.ts);
-  }
-
-  static async load(id) {
-    var rsp = await Cloud.obj_get_meta(id);
-    return new File(id, rsp.name, rsp.desc, rsp.ts);
+    var id = await Cloud.doc_create(parid, name, desc);
+    return new Document(id, name, desc);
   }
 
   async update(name, desc) {
     if (name !== this.name || desc !== this.desc) {
       this.name = name;
       this.desc = desc;
-      this.ts = await Cloud.obj_update(this.id, this.name, this.desc);
+      await Cloud.doc_rename(this.id, this.name);
     }
+    this.notify();
   }
   
   async delete() {
-    await Cloud.obj_delete(this.id);
+    await Cloud.doc_delete(this.id);
   }
 
   set_content(c) {
@@ -72,7 +66,7 @@ export default class File extends TreeNode {
     // Changed on disk check?
     if (!this.content) {
       try {
-        this.content = JSON.parse(await Cloud.obj_load(this.id));
+        this.content = JSON.parse(await Cloud.doc_load(this.id));
       } catch (err) {
         Log.error(err);
       }
@@ -86,7 +80,7 @@ export default class File extends TreeNode {
     if (this.content) {
       c = JSON.stringify(this.content);
     }
-    this.ts = await Cloud.obj_save(this.id, c);
+    this.ts = await Cloud.doc_save(this.id, c);
   }
 
 }

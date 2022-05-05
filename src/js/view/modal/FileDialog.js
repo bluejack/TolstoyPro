@@ -73,7 +73,7 @@ export default class FileDialog extends Dialog {
     this.desc = document.getElementById('file_desc').value;
     try {
       this.#validate_input();
-      var proj = PHandler.get_curr();
+      var proj = PHandler.get();
       if (!this.file) {
         this.file = await proj.create_file(this.name, this.desc);
       } else {
@@ -98,9 +98,9 @@ export default class FileDialog extends Dialog {
     var but = document.getElementById('file_submit');
     if (this.file) {
       var input = document.getElementById('file_name');
-      input.value = this.file.get_name();
+      input.value = this.file.name;
       var desc = document.getElementById('file_desc');
-      desc.value = this.file.get_desc();
+      desc.value = this.file.desc;
     }
     but.innerHTML = ctoa;
     but.onclick = () => {

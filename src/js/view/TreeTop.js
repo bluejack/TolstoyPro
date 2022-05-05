@@ -21,7 +21,7 @@ export default class TreeTop extends Component {
   
   set_proj(proj) {
     if (proj) {
-      this.label = proj.get_name();
+      this.label = proj.name;
     } else {
       this.label = '-';
     }

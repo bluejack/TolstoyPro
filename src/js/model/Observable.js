@@ -6,13 +6,20 @@
 
 \* ======================================================================== */
 
-import Observable from './Observable.js';
-
-export default class TreeNode extends Observable {
-  constructor(name, desc, type) {
-    super();
-    this.name = name;
-    this.desc = desc;
-    this.type  = type;
+export default class Observable {
+  constructor() {
+    this.obs = [];
   }
+
+  observe(cb) {
+    this.obs.forEach((i) => {
+      if (i === cb) return;
+    });
+    this.obs.push(cb);
+  }
+  
+  notify() {
+    this.obs.forEach((cb) => { cb(this); });
+  }
+  
 }
