@@ -8,6 +8,7 @@
 
 import Dialog   from './Dialog.js';
 import PHandler from '../../controller/ProjectHandler.js';
+import TextEditor from '../../editor/TextEditor.js';
 
 const display = `
 <div id="deldoc" class="modal_body">
@@ -19,15 +20,16 @@ const display = `
 
 export default class DeleteDoc extends Dialog {
   constructor(file) {
-    var t = 'Delete Document: ' + file.get_name();
+    var t = 'Delete Document: ' + file.name;
     super(t, true);
     this.file = file;
   }
 
   async handle_submit() {
     try {
+      TextEditor.set_file(null);
+      PHandler.get().remove_doc(this.file);
       await this.file.delete();
-      PHandler.get_curr().remove_doc(this.file);
     } catch (err) {
       console.log(err);
     }

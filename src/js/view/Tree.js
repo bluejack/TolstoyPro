@@ -6,7 +6,9 @@
    
 \* ========================================================================= */
 
+import ModalFactory from './modal/ModalFactory.js';
 import ProjectHandler from '../controller/ProjectHandler.js';
+import TreeBinder from './TreeBinder.js';
 import TreeDoc  from './TreeDoc.js';
 import TreeTop  from './TreeTop.js';
 
@@ -23,7 +25,7 @@ var helm;
 
 function init() {
   var pelm = document.getElementById('tree');
-  pelm.insertAdjacentHTML('beforeend', html);
+  pelm.innerHTML = html;
   var telm = document.getElementById('tree_view');
   var proj = ProjectHandler.get();
   var top = new TreeTop(telm, proj);
@@ -32,21 +34,33 @@ function init() {
   helm = document.getElementById('hier');
   if (proj) {
     render(proj);
-    proj.observe(render);
+    proj.observe(validate);
   }
   ProjectHandler.observe((p) => {
-    p.observe(render);
+    p.observe(validate);
     render(p);
     // Do we need to watch the project for changes?
   });
 }
 
+function validate(p) {
+  if (!p.curr) {
+    ModalFactory.enqueue('file_create');
+  }
+  render(p);
+}
+
 function render(p) {
   if (p) {
     helm.innerHTML = '';
+    // TODO  sAdd binders.
     p.walk_tree((i) => {
-      var titem = new TreeDoc(helm, i, p);
-      titem.render();
+      if (i.type == 'doc') {
+        var titem = new TreeDoc(helm, i, p);
+        titem.render();
+      } else {
+        new TreeBinder(helm, i, p).render();
+      }
     });
   }
 }

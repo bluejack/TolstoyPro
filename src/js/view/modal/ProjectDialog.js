@@ -26,7 +26,7 @@ export default class ProjectDialog extends Dialog {
   constructor(proj) {
     var t = 'Create Project';
     if (proj) {
-      t = 'Edit ' + proj.get_name();
+      t = 'Edit ' + proj.name;
     }
     super(t, true);
     this.project = proj;
@@ -89,7 +89,7 @@ export default class ProjectDialog extends Dialog {
     var but = document.getElementById('proj_submit');
     if (this.project) {
       var input = document.getElementById('project_name');
-      input.value = this.project.get_name();
+      input.value = this.project.name;
     }
     but.innerHTML = ctoa;
     but.onclick = () => {

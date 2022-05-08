@@ -7,8 +7,8 @@
 \* ========================================================================= */
 
 import Component from './Component.js';
-import EditProjectDialog from './modal/EditProjectDialog.js';
 import ProjectHandler from '../controller/ProjectHandler.js';
+import ProjectContextMenu from './ProjectContextMenu.js';
 
 export default class TreeTop extends Component {
   constructor(pelm, proj) {
@@ -41,10 +41,10 @@ export default class TreeTop extends Component {
     super.render();
     this.elm = document.getElementById('tree_top');
     this.elm.innerHTML = this.label;
+    
     this.elm.addEventListener('contextmenu', function (e) {
       e.preventDefault();
-      var edit_proj = new EditProjectDialog(self.proj);
-      edit_proj.render();
+      ProjectContextMenu.display(e);
     });
   }
 }

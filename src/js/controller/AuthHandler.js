@@ -39,8 +39,9 @@ export default (() => {
       if (u) {
         user = new User(u);
       }
-      await AppState.init(user);
+      await AppState.init();
       await ProjectHandler.init();
+      View.init();
     } catch (err) {
       Log.error(err);
       return null;

@@ -26,6 +26,7 @@ export default {
 
 function init() {
   var melm = document.getElementById('menu');
+  melm.innerHTML = '';
   var home_menu = new TopMenu(melm, 'hmenu', '<img src="/img/TolstoyPro.Menu.png" alt="TolstoyPro" height="18" width="18" />');
   var home_dom = home_menu.render();
   home_menu.add_menu_item(new AlwaysOnMenuItem(home_dom, 'about_mi', 'About', 

@@ -26,7 +26,17 @@ export default class ChangeLog extends ModalPage {
       <li><b>Pre-Release Development</b>
         <ol class="minver" style="counter-reset: minver 3" reversed>
           <li><b><u>The Basic Editor</u>
-            <ol class="relver" style="counter-reset: relver 9" reversed>
+            <ol class="relver" style="counter-reset: relver 11" reversed>
+              <li> (05.05.22)
+                <ul class="clist">
+                  <li> Project context menu</li>
+                </ul>
+              </li>
+              <li> (05.04.22)
+                <ul class="clist">
+                  <li> Refactoring & restructuring of metadata.</li>
+                </ul>
+              </li>
               <li> (05.01.22)
                 <ul class="clist">
                   <li> File delete</li>

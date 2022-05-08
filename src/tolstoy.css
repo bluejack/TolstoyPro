@@ -1,3 +1,4 @@
+
 .default_theme {
   --primary-bg: #FAF6F0;
   --content-bg: #FFFBF6;
@@ -28,6 +29,7 @@
   --monofont: "IBM Plex Mono", monospace;
   --page-text-weight: normal;
   --doc-icon: url('/img/document_lt.svg');
+  --binder-icon: url('/img/binder_icon.svg');  
   --icon-filter: invert(0);
 }
 
@@ -61,6 +63,7 @@
   --monofont: "IBM Plex Mono", monospace;
   --page-text-weight: normal;
   --doc-icon: url('/img/document_lt.svg');
+  --binder-icon: url('/img/binder_icon.svg');  
   --icon-filter: invert(0);
 }
 
@@ -94,7 +97,9 @@
   --monofont: "IBM Plex Mono", monospace;
   --page-text-weight: 200;
   --doc-icon: url('/img/document-dk.svg');
-  --icon-filter: invert(0.6);
+  --binder-icon: url('/img/binder_icon.svg');  
+  --doc-filter: invert(0.6);
+  --binder-filter: invert(0.82);
 }
 
 html {
@@ -402,7 +407,6 @@ b {
 
 .tree_icon {
   vertical-align: top;
-  filter: var(--icon-filter);
   display: inline-block;
   height: 12px;
   width: 12px;
@@ -415,7 +419,15 @@ b {
 }
 
 .tree_doc {
+  filter: var(--doc-filter);
   background-image: var(--doc-icon);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.tree_binder {
+  filter: var(--binder-filter);
+  background-image: var(--binder-icon);
   background-repeat: no-repeat;
   background-size: cover;
 }

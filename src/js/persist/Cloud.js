@@ -28,6 +28,8 @@ export default {
   proj_create:   proj_create,
   proj_load:     proj_load, 
   proj_save:     proj_save,
+  proj_list:     proj_list,
+  proj_rename:   proj_rename,
   
   // Documents
   doc_create:    doc_create,
@@ -170,7 +172,7 @@ async function app_save(s) {
 async function proj_create(name) {
   const proj_id = await _obj_create(root_fid, name, OBJ_TYPE_PROJECT, MIME_TYPE_FOLDER);
   const meta_id = await _obj_create(proj_id, PROJ_META_NAME, OBJ_TYPE_META, MIME_TYPE_JSON);
-  return { proj_id: proj_id, meta_id: meta_id }
+  return { proj_id: proj_id, meta_id: meta_id };
 }
 
 async function proj_load(id) {

@@ -31,7 +31,7 @@ export default class FileDialog extends Dialog {
   constructor(file) {
     var t = 'Create File';
     if (file) {
-      t = 'Edit ' + file.get_name();
+      t = 'Edit ' + file.name;
     }
     super(t, true);
     this.file = file;
@@ -49,7 +49,7 @@ export default class FileDialog extends Dialog {
       throw('empty-name');
     } else {
       if (this.file) {
-        if (this.file.get_name() == this.name && this.file.get_desc() == this.desc) {
+        if (this.file.name == this.name && this.file.desc == this.desc) {
           throw('no-change');
         }
       }

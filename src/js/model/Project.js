@@ -76,12 +76,12 @@ export default class Project {
   async reconcile() {
     var state    = await Cloud.proj_load(this.id);
     this.#decode(state);
-    this.#notify();
+    this.notify();
   }
 
   set_curr(doc) {
     this.curr = doc;
-    this.#notify();
+    this.notify();
     this.save();
   }
 
@@ -100,12 +100,22 @@ export default class Project {
     }
   }
 
+  create_binder(name, desc, parent) {
+    if (!parent) {
+      parent = this;
+    }
+    var binder = new Binder(name, desc);
+    parent.tree.push(binder);
+    parent.notify();
+    this.save();
+  }
+
   async create_file(name, desc) {
     try {
       var file = await Doc.create(this.id, name, desc);
       this.tree.push(file);
       this.curr = file;
-      this.#notify();
+      this.notify();
       this.save();
     } catch (err) {
       console.log(err);
@@ -119,24 +129,24 @@ export default class Project {
       this.name = name;
       await this.save();
     }
-    this.#notify();
+    this.notify();
   }
   
   async remove_doc(d) {
     var reset_curr = false;
     if (d === this.curr) {
       reset_curr = true;
+      this.curr = null;
     }
     this.walk_tree((doc,arr,pos) => {
       if (doc.id && d.id == doc.id) {
-        arr.splice(pos,0)
-        return true;
+        arr.splice(pos,1);
       } else if (reset_curr) {
         this.curr = doc;
         reset_curr = false;
       }
     });
-    this.#notify();
+    this.notify();
     this.save();
   }
   
@@ -212,6 +222,9 @@ export default class Project {
           }
         });
       }
+      if (!(self.curr instanceof Doc)) {
+        self.curr = null;
+      }
       return arr;
     }
     this.tree = _hydrate_tree(state.tree);
@@ -220,12 +233,12 @@ export default class Project {
   observe(cb) {
     this.observers.push(cb);
     if (this.pending == true) {
-      this.#notify();
+      this.notify();
       this.pending == false;
     }
   }
   
-  #notify() {
+  notify() {
     if (this.observers.length == 0) {
       this.pending = true;
     }

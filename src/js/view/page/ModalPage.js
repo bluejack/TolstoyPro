@@ -43,5 +43,10 @@ export default class ModalPage extends Modal {
     this.#_handle_closable();
     document.getElementById('modal_done').onclick = () => { this.remove(); };
     document.getElementById('modal_page_content').innerHTML = this.html;
+    // This is somewhat insane... I can't figure out what is scrolling past the title.
+    var melm = document.getElementById('modal_page');
+    setTimeout(() => {
+      melm.scrollTo(0,0);
+    },5);    
   }
 }

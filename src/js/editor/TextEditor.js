@@ -6,6 +6,7 @@
 
 \* ========================================================================= */
 
+import Document from '../model/Document.js';
 import Quill from 'quill';
 import Log   from '../sys/Log.js';
 import PersistObserver from './PersistObserver.js';
@@ -81,6 +82,12 @@ function proj_observer(proj) {
 }
 
 async function set_file(f) {
+  if (! (f instanceof Document)) {
+    file = null;
+    PersistObserver.pause();
+    return;
+    // TODO - disable editor.
+  }
   try {
     if (file) {
       PersistObserver.pause();

@@ -20,7 +20,7 @@ const display = `
 export default class ProjectChooser extends Dialog {
   constructor() {
     super('Project Chooser', true);
-    this.project = ProjectHandler.get_curr();
+    this.project = ProjectHandler.get();
   }
 
   async render(pelm) {
@@ -28,15 +28,18 @@ export default class ProjectChooser extends Dialog {
     pelm.insertAdjacentHTML('afterbegin', display);
     var optlist = document.getElementById('proj_options');
     var plist = await ProjectHandler.list();
-    var curr = this.project.get_id();
+    var curr = null;
+    if (this.project) {
+      curr = this.project.id;
+    }
     plist.forEach((proj) => {
       if (proj.id == curr) {
         optlist.insertAdjacentHTML("beforeend", '<li> (current) ' + proj.name + '</li>');
       } else {
         optlist.insertAdjacentHTML("beforeend", '<li><a href="#" id="' + proj.id + '">' + proj.name + '</a></li>');
-        document.getElementById(proj.id).onclick = () => {
-          var project = new Project(proj.name, proj.id);
-          ProjectHandler.set_curr(project);
+        document.getElementById(proj.id).onclick = async () => {
+          var project = await Project.load(proj.id);
+          ProjectHandler.set(project);
           super.remove();
         };
       }

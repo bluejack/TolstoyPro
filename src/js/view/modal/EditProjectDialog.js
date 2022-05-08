@@ -12,6 +12,6 @@ import PHandler      from '../../controller/ProjectHandler.js';
 
 export default class EditProjectDialog extends ProjectDialog {
   constructor() {
-    super(PHandler.get_curr(), true);
+    super(PHandler.get(), true);
   }
 }
