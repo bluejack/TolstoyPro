@@ -24,18 +24,20 @@ const display = `
   </div>
   <div class="row">
     <span class="label"><button class="gp_button" id="file_submit" name="file_submit"></button></span>
+  </div>
 </div>
 `;
 
-export default class FileDialog extends Dialog {
-  constructor(file) {
-    var t = 'Create File';
-    if (file) {
-      t = 'Edit ' + file.name;
+export default class DocumentDialog extends Dialog {
+  constructor(binder, doc) {
+    var t = 'Create Document';
+    if (doc) {
+      t = 'Edit ' + doc.name;
     }
     super(t, true);
-    this.file = file;
-    this.title   = t;
+    this.doc = doc;
+    this.title = t;
+    this.binder = binder;
   }
 
   #reset_display() {
@@ -48,8 +50,8 @@ export default class FileDialog extends Dialog {
     if (!this.name) {
       throw('empty-name');
     } else {
-      if (this.file) {
-        if (this.file.name == this.name && this.file.desc == this.desc) {
+      if (this.doc) {
+        if (this.doc.name == this.name && this.doc.desc == this.desc) {
           throw('no-change');
         }
       }
@@ -74,10 +76,10 @@ export default class FileDialog extends Dialog {
     try {
       this.#validate_input();
       var proj = PHandler.get();
-      if (!this.file) {
-        this.file = await proj.create_file(this.name, this.desc);
+      if (!this.doc) {
+        this.doc = await proj.create_file(this.name, this.desc, this.binder);
       } else {
-        await this.file.update(this.name, this.desc);
+        await this.doc.update(this.name, this.desc);
         Tree.render(proj);
         proj.save();
       }
@@ -90,17 +92,17 @@ export default class FileDialog extends Dialog {
   render() {
     var pelm = super.render();
     var ctoa   = 'Create';
-    if (this.file) {
+    if (this.doc) {
       ctoa = 'Save';
     }
     pelm.innerHTML = display;
     var self = this;
     var but = document.getElementById('file_submit');
-    if (this.file) {
+    if (this.doc) {
       var input = document.getElementById('file_name');
-      input.value = this.file.name;
+      input.value = this.doc.name;
       var desc = document.getElementById('file_desc');
-      desc.value = this.file.desc;
+      desc.value = this.doc.desc;
     }
     but.innerHTML = ctoa;
     but.onclick = () => {

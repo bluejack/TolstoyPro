@@ -8,7 +8,7 @@
 
 import Dialog   from './Dialog.js';
 import PHandler from '../../controller/ProjectHandler.js';
-import Tree from '../Tree.js';
+import TreeFrame from '../TreeFrame.js';
 
 const display = `
 <div id="file" class="modal_body">
@@ -26,12 +26,13 @@ const display = `
 `;
 
 export default class BinderDialog extends Dialog {
-  constructor(binder) {
+  constructor(parent, binder) {
     var t = 'Create Binder';
     if (binder) {
       t = 'Edit ' + binder.name;
     }
     super(t, true);
+    this.parent = parent;
     this.binder = binder;
     this.title   = t;
   }
@@ -54,8 +55,7 @@ export default class BinderDialog extends Dialog {
     try {
       var proj = PHandler.get();
       if (!this.binder) {
-        this.binder = await proj.create_binder(this.name, this.desc);
-        Tree.render(proj);
+        this.binder = await proj.create_binder(this.name, this.desc, this.parent);
       } else {
         await this.binder.update(this.name, this.desc);
         proj.save();

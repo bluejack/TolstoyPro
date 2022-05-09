@@ -30,7 +30,7 @@ function init() {
 function reset() {
   layout.win_width  = window.innerWidth;
   layout.win_height = window.innerHeight;
-  t = document.getElementById('tree');
+  t = document.getElementById('tree_frame');
   e = document.getElementById('editor');
   a = document.getElementById('applets');
   var aw = a.clientWidth;

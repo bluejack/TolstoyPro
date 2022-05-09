@@ -4,9 +4,9 @@
 
 \* ======================================================================== */
 
-import EditProject  from './modal/EditProjectDialog.js';
-import BinderDialog from './modal/BinderDialog.js';
-import FileDialog   from './modal/FileDialog.js';
+import EditProject    from './modal/EditProjectDialog.js';
+import BinderDialog   from './modal/BinderDialog.js';
+import DocumentDialog from './modal/DocumentDialog.js';
 
 export default {
   display: display
@@ -34,9 +34,9 @@ function display(event) {
 
   add_doc.onclick = () => {
     _dismiss();
-    var add_doc = new FileDialog();
+    var add_doc = new DocumentDialog();
     add_doc.render();
-  }
+  };
 
   add_bind.onclick = () => {
     _dismiss();

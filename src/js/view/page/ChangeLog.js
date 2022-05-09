@@ -27,6 +27,11 @@ export default class ChangeLog extends ModalPage {
         <ol class="minver" style="counter-reset: minver 3" reversed>
           <li><b><u>The Basic Editor</u>
             <ol class="relver" style="counter-reset: relver 11" reversed>
+              <li> (05.08.22)
+                <ul class="clist">
+                  <li> Full support for binders</li>
+                </ul>
+              </li>
               <li> (05.05.22)
                 <ul class="clist">
                   <li> Project context menu</li>

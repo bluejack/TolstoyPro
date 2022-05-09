@@ -12,51 +12,53 @@
 \* ========================================================================= */
 
 import BCM        from './BinderContextMenu.js';
+import Tree       from './Tree.js';
 import TreeItem   from './TreeItem.js';
 import TreeDoc    from './TreeDoc.js';
 import { v4 as uuidv4 } from 'uuid';
 
+const TREE_CLASS = 'subtree';
+
 export default class TreeBinder extends TreeItem {
-  constructor(pelm, item, proj, folder) {
-    var domid = uuidv4();
-    super(pelm, domid, item, proj, folder);
-    this.html = `<div id="${domid}" class="tree_item"><span class="tree_icon tree_binder">&nbsp;</span><span class="tree_label">${item.name}<span></div>`;
+  constructor(pelm, model, binder) {
+    super(pelm, uuidv4(), model, binder);
+    this.labid = uuidv4();
+    this.html = `<div id="${this.id}" class="tree_item"><span class="toggle_icon">&nbsp;</span><span class="tree_icon tree_binder">&nbsp;</span><span id="${this.labid}" class="tree_label">${model.name}<span></div>`;
     this.subtree = null;
     this.open = false;
   }
 
   toggle() {
-    if (this.open) {
-      this.subtree.display = 'none';
+    if (this.model.open) {
+      this.model.open = false;
+      this.subtree.style.display = 'none';
+      this.elm.firstChild.innerHTML = '&#x25B9;';
     } else {
-      this.subtree.display = 'block';
-    }
-  }
-
-  generate_subtree() {
-    var domid = uuidv4;
-    var p = this.proj;
-    var subtree = `<div id="${domid}" class="subtree"></div>`;
-    this.elm.insertAdjacentHTML('beforeend', subtree);
-    var stelm = document.getElementById(domid);
-    if (this.item.tree) {
-      this.item.tree.forEach((i) => {
-        var titem = new TreeDoc(stelm, i, p);
-        titem.render();
-      });
+      this.model.open = true;
+      this.subtree.style.display = 'block';
+      this.elm.firstChild.innerHTML = '&#x25BF;';
     }
   }
 
   render() {
     super.render();
     var self = this;
-    this.generate_subtree();
-    this.elm.onclick = () => {
+    var stree = new Tree(this.elm,this.model,TREE_CLASS);
+    this.subtree = stree.render();
+    this.labelm = document.getElementById(this.labid);
+    if (this.model.open) {
+      this.elm.firstChild.innerHTML = '&#x25BF;';
+      this.subtree.style.display = 'block';      
+    } else {
+      this.elm.firstChild.innerHTML = '&#x25B9;';
+      this.subtree.style.display = 'none';      
+    }
+    this.labelm.onclick = () => {
       self.toggle(); 
     };
-    this.elm.addEventListener('contextmenu', function (e) {
+    this.labelm.addEventListener('contextmenu', function (e) {
       e.preventDefault();
-      DCM.display(e, self.item);
+      BCM.display(e, self.model);
     });
   }
   

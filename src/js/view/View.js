@@ -17,8 +17,7 @@ import Footer           from './Footer.js';
 import Log              from '../sys/Log.js';
 import Menu             from './Menu.js';
 import ModalFactory     from './modal/ModalFactory.js';
-import ProjectHandler   from '../controller/ProjectHandler.js';
-import Tree             from './Tree.js';
+import TreeFrame        from './TreeFrame.js';
 
 /* ( Interface )>----------------------------------------------------------- */
 
@@ -50,7 +49,7 @@ function enqueue(action) {
 /* ( Private Methods )>----------------------------------------------------- */
 function _build_ui() {
   Menu.init();
-  Tree.init();
+  TreeFrame.init();
   Editor.init();
   Applet.init();
   Footer.init();

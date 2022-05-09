@@ -4,8 +4,8 @@
 
 \* ======================================================================== */
 
-import DeleteDoc  from './modal/DeleteDoc.js';
-import FileDialog from './modal/FileDialog.js';
+import DeleteDoc from './modal/DeleteDoc.js';
+import DocDialog from './modal/DocumentDialog.js';
 
 export default {
   display: display
@@ -26,7 +26,7 @@ function display(event, item) {
 
   rnm_doc.onclick = () => {
     _dismiss();
-    var edit_file = new FileDialog(item);
+    var edit_file = new DocDialog(item);
     edit_file.render(); 
   };
 

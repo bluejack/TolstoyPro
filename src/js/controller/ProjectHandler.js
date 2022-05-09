@@ -84,7 +84,7 @@ async function create(name) {
   var p = await Project.create(name);
   curr_proj = p;
   AppState.proj_id(p);
-  ModalFactory.enqueue('file_create');
+  ModalFactory.enqueue('doc_create');
   notify();
 }
 
@@ -112,6 +112,6 @@ function notify() {
 
 function _validate() {
   if (!curr_proj.curr) {
-    ModalFactory.enqueue('file_create');
+    ModalFactory.enqueue('doc_create');
   }
 }

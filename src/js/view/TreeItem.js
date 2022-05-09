@@ -7,13 +7,11 @@
 \* ========================================================================= */
 
 import Component from './Component.js';
-import FileDialog from './modal/FileDialog.js';
 
 export default class TreeItem extends Component {
-  constructor(pelm, id, item, proj, folder) {
+  constructor(pelm, id, model, binder) {
     super(pelm, id);
-    this.item = item;
-    this.proj = proj;
+    this.model  = model;
+    this.binder = binder;
   }
-
 }

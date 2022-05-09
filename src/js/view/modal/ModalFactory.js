@@ -11,7 +11,7 @@
 import AboutPage         from '../page/AboutPage.js';
 import ChangeLog         from '../page/ChangeLog.js';
 import EditProjectDialog from './EditProjectDialog.js';
-import FileDialog        from './FileDialog.js';
+import DocumentDialog    from './DocumentDialog.js';
 import IntroPage         from '../page/IntroPage.js';
 import Log               from '../../sys/Log.js';
 import LogoutPage        from '../page/LogoutPage.js';
@@ -36,7 +36,7 @@ var queue = [];
 var map = {
   about:          () => { return new AboutPage();         },
   changelog:      () => { return new ChangeLog();         },
-  file_create:    () => { return new FileDialog();        },
+  doc_create:     () => { return new DocumentDialog();    },
   intro:          () => { return new IntroPage();         },
   logout:         () => { return new LogoutPage();        },
   pchoose:        () => { return new ProjectChooser();    },

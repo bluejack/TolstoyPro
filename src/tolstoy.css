@@ -363,45 +363,42 @@ b {
 }
  
 /* -- tree view -- */
-#tree {
+#tree_frame {
   position: absolute;
   display: block;
   width: 210px;
+  margin-left: 12px;
   overflow-x: hidden;
   overflow-y: scroll;
   font-size: 0.9em;
 }
 
-#tree_panel {
-  font-family: "Tahoma", "Arial", sans-serif;
-  font-size: 0.9em;
-}
-
-#tree_view {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  left: 6px;
-  padding: 6px;
-  border-top: 1px solid var(--std-border);
-}
-
-#tree_top {
+#proj_label {
   border-bottom: 1px solid var(--std-border);
   font-size: 1.05em;
   font-weight: bold;
+  margin-top: 6px;
   padding-bottom: 4px;
   cursor: pointer;
 }
 
-#hier {
-  padding-top: 2px;
+.toggle_icon {
+  display: inline-block;
+  width: 12px;
+  text-align: left;
+}
+
+.root_tree {
+  font-size: 0.9em;
+  line-height: 12px;
+}
+
+.subtree {
+  margin-left: 12px;
 }
 
 .tree_item {
-  height: 18px;
-  padding-top: 2px;
-  font-size: 0.8em;
+  padding-top: 8px;
   cursor: pointer;
 }
 

@@ -81,7 +81,6 @@ export default class Project {
 
   set_curr(doc) {
     this.curr = doc;
-    this.notify();
     this.save();
   }
 
@@ -101,21 +100,26 @@ export default class Project {
   }
 
   create_binder(name, desc, parent) {
-    if (!parent) {
-      parent = this;
-    }
     var binder = new Binder(name, desc);
-    parent.tree.push(binder);
-    parent.notify();
+    if (!parent) {
+      this.tree.push(binder);
+    } else {
+      parent.tree.push(binder);
+      parent.notify();
+    }
     this.save();
   }
 
-  async create_file(name, desc) {
+  async create_file(name, desc, binder) {
     try {
       var file = await Doc.create(this.id, name, desc);
-      this.tree.push(file);
+      if (binder) {
+        binder.tree.push(file);
+        binder.open = true;
+      } else {
+        this.tree.push(file);
+      }
       this.curr = file;
-      this.notify();
       this.save();
     } catch (err) {
       console.log(err);
@@ -129,7 +133,6 @@ export default class Project {
       this.name = name;
       await this.save();
     }
-    this.notify();
   }
   
   async remove_doc(d) {
@@ -146,18 +149,17 @@ export default class Project {
         reset_curr = false;
       }
     });
-    this.notify();
     this.save();
   }
   
   async save() {
+    this. notify();
     var state = this.#encode();
     window.localStorage.setItem(this.id, JSON.stringify(state));
     return Cloud.proj_save(this.meta, state);
   }
   
   #encode() {
-    
     
     function _extract_array(arr) {
       var tree = [];
@@ -173,6 +175,7 @@ export default class Project {
             tree.push(node);
             break;
           case 'bind':
+            node.open = i.open;
             node.tree = _extract_array(i.tree);
             tree.push(node);
             break;
@@ -208,14 +211,15 @@ export default class Project {
           switch (i.type) {
             case 'doc':
               var f = new Doc(i.id, i.name, i.desc);
-              if (i.id === self.curr) {
+              if (!self.curr || i.id === self.curr) {
                 self.curr = f;
               }
               arr.push(f);
               break;
             case 'bind':
-              var n = new Binder(i.name, i.desc);
+              var n = new Binder(i.name, i.desc, i.open);
               n.tree = _hydrate_tree(i.tree);
+              arr.push(n);
               break;
             default:
               console.log(`Unexpected type: ${i.type}`);
@@ -233,8 +237,8 @@ export default class Project {
   observe(cb) {
     this.observers.push(cb);
     if (this.pending == true) {
+      this.pending = false;
       this.notify();
-      this.pending == false;
     }
   }
   
