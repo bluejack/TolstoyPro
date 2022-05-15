@@ -26,7 +26,12 @@ export default class ChangeLog extends ModalPage {
       <li><b>Pre-Release Development</b>
         <ol class="minver" style="counter-reset: minver 3" reversed>
           <li><b><u>The Basic Editor</u>
-            <ol class="relver" style="counter-reset: relver 11" reversed>
+            <ol class="relver" style="counter-reset: relver 12" reversed>
+              <li> (05.14.22)
+                <ul class="clist">
+                  <li> Binder/Document tree is now re-sequencable</li>
+                </ul>
+              </li>
               <li> (05.08.22)
                 <ul class="clist">
                   <li> Full support for binders</li>
