@@ -14,6 +14,8 @@ import ProjectHandler  from '../controller/ProjectHandler.js';
 
 export default {
   init:     init,
+  pause:    pause,
+  resume:   resume,
   set_file: set_file
 };
 
@@ -22,26 +24,28 @@ const html = `<div id="editable"></div>`;
 var edelm;
 var quedit;
 var file; 
+var onhold;
+var blankpage = { ops: [ { insert: '\n' }]};
 
 function init() {
   document.getElementById('editor').innerHTML = html;
   edelm = document.getElementById('editable');
   var toolbarOptions = [
+    [{ 'font': [] }],
     ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-    ['blockquote', 'code-block'],
+//    ['blockquote', 'code-block'],
   
-    [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+//    [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+    [{ 'align': [] }],
     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
     [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
-    [{ 'direction': 'rtl' }],                         // text direction
+    [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+//    [{ 'direction': 'rtl' }],                         // text direction
   
     [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
     [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
   
-    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-    [{ 'font': [] }],
-    [{ 'align': [] }],
+//    [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
   
     ['clean']                                         // remove formatting button
   ];
@@ -81,6 +85,27 @@ function proj_observer(proj) {
   }
 }
 
+function pause() {
+  
+  if (file) {
+    PersistObserver.pause();
+    file.set_content(quedit.getContents());
+    quedit.setContents(blankpage);
+    file.save();
+  }
+  onhold = file;
+  file = null;
+}
+
+function resume() {
+  if (onhold && !file) {
+    file = onhold;
+    onhold = null;
+    quedit.detContants(file.get_content());
+    PersistObserver.start(file);
+  }
+}
+
 async function set_file(f) {
   if (! (f instanceof Document)) {
     file = null;
@@ -97,7 +122,7 @@ async function set_file(f) {
     file = f;
     var ct = await f.get_content();
     if (!ct) {
-      ct = { ops: [ { insert: '\n' }]};
+      ct = blankpage;
     }
     quedit.setContents(ct,'api');
     PersistObserver.start(f);

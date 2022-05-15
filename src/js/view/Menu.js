@@ -49,7 +49,7 @@ function init() {
   var file_menu = new TopMenu(melm, 'filemenu', 'File');
   var file_dom = file_menu.render();
   file_menu.add_menu_item(new MenuItem(file_dom, 'newfile_mi', 'New File', 
-    () => { ModalFactory.enqueue('file_create'); }));
+    () => { ModalFactory.enqueue('doc_create'); }));
 
   var help_menu = new TopMenu(melm, 'helpmenu', 'Help');
   var help_dom = help_menu.render();

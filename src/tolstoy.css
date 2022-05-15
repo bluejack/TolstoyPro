@@ -31,6 +31,7 @@
   --doc-icon: url('/img/document_lt.svg');
   --binder-icon: url('/img/binder_icon.svg');  
   --icon-filter: invert(0);
+  --tree-loc: #0000FF;
 }
 
 .cream_theme {
@@ -65,6 +66,7 @@
   --doc-icon: url('/img/document_lt.svg');
   --binder-icon: url('/img/binder_icon.svg');  
   --icon-filter: invert(0);
+  --tree-loc: #0000FF;
 }
 
 .dark_theme {
@@ -100,6 +102,8 @@
   --binder-icon: url('/img/binder_icon.svg');  
   --doc-filter: invert(0.6);
   --binder-filter: invert(0.82);
+  --tree-loc: #0000FF;
+
 }
 
 html {
@@ -308,8 +312,10 @@ b {
 
 #thebiz {
   position: relative;
-  height: 100%;
+  display: flex;
+  height: 100vh;
   width: 100%;
+  overflow: auto;
 }
 
 #applets {
@@ -429,19 +435,42 @@ b {
   background-size: cover;
 }
 
+#tree_pos {
+  display: none;
+  height: 8px;
+  width: 80%;
+  margin-left: 10px;
+  background-color: var(--tree-loc);
+  box-shadow: var(--primary-bg) 5px 5px 3px -2px inset, var(--primary-bg) -5px -5px 3px -2px inset; 
+  border-radius: 4px;
+}
+
 /* -- Editor -- */
  
 #editor {
   position: absolute;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
   top: 0;
   left: 200;
-  display: block;
   background-color: var(--content-bg);
   border: 1px solid var(--std-border);
   border-radius: 8px;
 }
 
 #editable {
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
+  height: auto;
+}
+
+.ql-editor {
+  display: flex;
+  flex-flow: column;
+  height: auto;
+  width: 100%;
   overflow-y: scroll;
 }
 

@@ -21,11 +21,12 @@ const TREE_CLASS = 'subtree';
 
 export default class TreeBinder extends TreeItem {
   constructor(pelm, model, binder) {
-    super(pelm, uuidv4(), model, binder);
-    this.labid = uuidv4();
-    this.html = `<div id="${this.id}" class="tree_item"><span class="toggle_icon">&nbsp;</span><span class="tree_icon tree_binder">&nbsp;</span><span id="${this.labid}" class="tree_label">${model.name}<span></div>`;
+    var id = uuidv4();
+    super(pelm, id, model, binder);
+    this.id = id;
+    this.tree_id = uuidv4();
+    this.html = `<div id="${this.tree_id}" class="tree_item"><span class="toggle_icon">&nbsp;</span><span class="tree_icon tree_binder">&nbsp;</span><span id="${this.id}" class="tree_label">${model.name}<span></div>`;
     this.subtree = null;
-    this.open = false;
   }
 
   toggle() {
@@ -43,20 +44,21 @@ export default class TreeBinder extends TreeItem {
   render() {
     super.render();
     var self = this;
-    var stree = new Tree(this.elm,this.model,TREE_CLASS);
-    this.subtree = stree.render();
-    this.labelm = document.getElementById(this.labid);
+    this.tree_par = document.getElementById(this.tree_id);
+    this.handle = this.tree_par;
+    this.stree = new Tree(this.tree_par,this.model,TREE_CLASS);
+    this.subtree = this.stree.render();
     if (this.model.open) {
-      this.elm.firstChild.innerHTML = '&#x25BF;';
+      this.tree_par.firstChild.innerHTML = '&#x25BF;';
       this.subtree.style.display = 'block';      
     } else {
-      this.elm.firstChild.innerHTML = '&#x25B9;';
+      this.tree_par.firstChild.innerHTML = '&#x25B9;';
       this.subtree.style.display = 'none';      
     }
-    this.labelm.onclick = () => {
+    this.elm.onclick = () => {
       self.toggle(); 
     };
-    this.labelm.addEventListener('contextmenu', function (e) {
+    this.elm.addEventListener('contextmenu', function (e) {
       e.preventDefault();
       BCM.display(e, self.model);
     });

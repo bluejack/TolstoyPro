@@ -17,10 +17,9 @@ var layout = {
   tree_width:   0,
   applet_width: 0,
   win_width:    0,
-  win_height:   0
+  win_height:   0,
+  edit_height:  0
 };
-
-var t, e, a;
 
 function init() {
   window.onresize = reset;
@@ -30,22 +29,25 @@ function init() {
 function reset() {
   layout.win_width  = window.innerWidth;
   layout.win_height = window.innerHeight;
-  t = document.getElementById('tree_frame');
-  e = document.getElementById('editor');
-  a = document.getElementById('applets');
+  const t = document.getElementById('tree_frame');
+  const e = document.getElementById('editor');
+  const a = document.getElementById('applets');
+  const m = document.getElementById('menu');
+  const f = document.getElementById('footer');
   var aw = a.clientWidth;
   if (layout.content_left == 0) {
     var tw = t.clientWidth;
     layout.tree_width    = tw;
     layout.applet_width  = aw;
     layout.content_left  = tw;
+    layout.edit_height   = layout.win_height - (m.offsetHeight + f.offsetHeight); 
   }
-  layout.win_height = layout.win_height - HEADER_FOOTER_HEIGHT;
+  layout.edit_height   = layout.win_height - (m.offsetHeight + f.offsetHeight); 
   e.style.left  = "" + layout.content_left + "px";
   e.style.width = "" + ((layout.win_width - layout.content_left) - layout.applet_width) + "px";  
   t.style.width  = "" + layout.tree_width + "px";
-  t.style.height = "" + layout.win_height + "px";
-  e.style.height = "" + layout.win_height + "px";
-  a.style.height = "" + layout.win_height + "px";
+  t.style.height = "" + layout.edit_height + "px";
+  e.style.height = "" + layout.edit_height + "px";
+  a.style.height = "" + layout.edit_height + "px";
 }
 

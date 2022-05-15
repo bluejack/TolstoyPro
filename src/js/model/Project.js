@@ -152,11 +152,66 @@ export default class Project {
     this.save();
   }
   
+  async move_after(from, to) {
+    if (!to) {
+      console.log("First pos");
+      this.#lift(from);
+      this.tree.splice(0,0,from);
+    } else if (from === to) {
+      console.log("No move required.");
+    } else {
+      this.#lift(from);
+      if (!this.#shift(from, to)) {
+        // This is a bug state, but we don't want to lose an item!
+        this.tree.splice(0,0,from);
+      }
+    }
+    this.notify();
+  }
+  
   async save() {
-    this. notify();
+    this.notify();
     var state = this.#encode();
     window.localStorage.setItem(this.id, JSON.stringify(state));
     return Cloud.proj_save(this.meta, state);
+  }
+  
+  #lift(node) {
+    function _scan_to_lift(t) {
+      for (var i = 0; i < t.length; i++) {
+        if (t[i] === node) {
+          t.splice(i, 1);
+          return true;
+        } else if (t[i] instanceof Binder) {
+          if (_scan_to_lift(t[i].tree)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    return _scan_to_lift(this.tree);
+  }
+  
+  #shift(add, after) {
+    function _scan_to_shift(t) {
+      for (var i = 0; i < t.length; i++) {
+        if (t[i] === after) {
+          if (t[i] instanceof Binder) {
+            t[i].tree.splice(0,0,add);
+          } else {
+            t.splice(i+1, 0, add);
+          }
+          return true;
+        } else if (t[i] instanceof Binder) {
+          if (_scan_to_shift(t[i].tree)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    return _scan_to_shift(this.tree);
   }
   
   #encode() {

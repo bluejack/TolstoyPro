@@ -23,14 +23,20 @@ export default class TreeDoc extends TreeItem {
 
   render() {
     super.render();
+    this.handle = this.elm;
     var self = this;
     this.elm.onclick = () => {
-      PHandler.get().set_curr(self.model);
+      if (self.clicking) {
+        PHandler.get().set_curr(self.model);
+      }
     };
     this.elm.addEventListener('contextmenu', function (e) {
       e.preventDefault();
-      DCM.display(e, self.model);
+      if (self.clicking) {
+        DCM.display(e, self.model);
+      }
     });
+    
   }
   
 }
