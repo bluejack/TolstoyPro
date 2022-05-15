@@ -447,6 +447,8 @@ b {
 
 /* -- Editor -- */
  
+/*  9415363242 */
+ 
 #editor {
   position: absolute;
   display: flex;
@@ -463,7 +465,16 @@ b {
   display: flex;
   flex-flow: column;
   overflow: hidden;
-  height: auto;
+  border:none;
+}
+
+.ql-toolbar.ql-snow {
+  border: none;
+  border-bottom: 1px solid var(--std-border);
+}
+
+.ql-container {
+  border: none;
 }
 
 .ql-editor {
@@ -472,6 +483,7 @@ b {
   height: auto;
   width: 100%;
   overflow-y: scroll;
+  border: none;
 }
 
  
